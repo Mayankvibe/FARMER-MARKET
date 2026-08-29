@@ -5,16 +5,23 @@ All routes, models, and logic are here. No microservices, no auth, no complexity
 """
 
 import os
+import hashlib
+import hmac
+import jwt
 import pandas as pd
 from pathlib import Path
 from typing import Optional, List
+from datetime import datetime, timedelta, timezone
+from dotenv import load_dotenv
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, text
 from sqlalchemy.orm import declarative_base, sessionmaker
-from datetime import datetime
+
+# ─── Load Environment Variables ──────────────────────────────────────────────
+load_dotenv()
 
 # ─── Config ──────────────────────────────────────────────────────────────────
 DATABASE_URL = os.getenv(
@@ -22,6 +29,53 @@ DATABASE_URL = os.getenv(
     "postgresql://postgres:Password123@localhost:5432/SIH"
 )
 CSV_PATH = Path(__file__).parent.parent / "data" / "market_prices.csv"
+JWT_SECRET = os.getenv("JWT_SECRET", "farmmarket_ai_secret_key_2026_super_secure_mvp")
+
+JWT_ALGORITHM = "HS256"
+
+# ─── Auth Utilities ───────────────────────────────────────────────────────────
+def hash_password(password: str) -> str:
+    """Hash password using PBKDF2-HMAC-SHA256 with random 16-byte salt."""
+    salt = os.urandom(16).hex()
+    pwd_hash = hashlib.pbkdf2_hmac(
+        "sha256",
+        password.encode("utf-8"),
+        salt.encode("utf-8"),
+        100000
+    ).hex()
+    return f"{salt}${pwd_hash}"
+
+
+def verify_password(plain_password: str, stored_password: str) -> bool:
+    """Verify plain password against stored salt$hash string."""
+    try:
+        salt, pwd_hash = stored_password.split("$")
+        computed_hash = hashlib.pbkdf2_hmac(
+            "sha256",
+            plain_password.encode("utf-8"),
+            salt.encode("utf-8"),
+            100000
+        ).hex()
+        return hmac.compare_digest(computed_hash, pwd_hash)
+    except Exception:
+        return False
+
+
+def create_access_token(data: dict) -> str:
+    """Create JWT access token with 7-day expiration."""
+    to_encode = data.copy()
+    expire = datetime.now(timezone.utc) + timedelta(days=7)
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
+
+
+def decode_access_token(token: str) -> Optional[dict]:
+    """Decode JWT token and return payload if valid."""
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        return payload
+    except Exception:
+        return None
 
 # ─── Database Setup ───────────────────────────────────────────────────────────
 engine = create_engine(DATABASE_URL)
@@ -30,6 +84,16 @@ Base = declarative_base()
 
 
 # ─── DB Models ───────────────────────────────────────────────────────────────
+class User(Base):
+    __tablename__ = "users"
+    id            = Column(Integer, primary_key=True, index=True)
+    name          = Column(String, nullable=False)
+    email         = Column(String, unique=True, index=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
+    role          = Column(String, nullable=False)  # "farmer" or "buyer"
+    created_at    = Column(DateTime, default=datetime.utcnow)
+
+
 class FarmerListing(Base):
     __tablename__ = "farmer_listings"
     id            = Column(Integer, primary_key=True, index=True)
@@ -69,6 +133,18 @@ app.add_middleware(
 
 
 # ─── Pydantic Schemas ─────────────────────────────────────────────────────────
+class UserSignUpIn(BaseModel):
+    name:     str
+    email:    str
+    password: str
+    role:     str  # "farmer" or "buyer"
+
+
+class UserSignInIn(BaseModel):
+    email:    str
+    password: str
+
+
 class FarmerListingIn(BaseModel):
     farmer_name:    str
     crop:           str
@@ -85,6 +161,91 @@ class BuyerRequestIn(BaseModel):
     required_quality: str
     offered_price:    float
     location:         Optional[str] = None
+
+
+# ─── Auth Endpoints ───────────────────────────────────────────────────────────
+@app.post("/auth/signup", status_code=201)
+def signup(data: UserSignUpIn):
+    role_clean = data.role.lower().strip()
+    if role_clean not in ["farmer", "buyer"]:
+        raise HTTPException(status_code=400, detail="Invalid role. Select Farmer/Seller or Buyer.")
+
+    email_clean = data.email.lower().strip()
+    if not email_clean or "@" not in email_clean:
+        raise HTTPException(status_code=400, detail="Please enter a valid email address.")
+
+    if len(data.password) < 4:
+        raise HTTPException(status_code=400, detail="Password must be at least 4 characters long.")
+
+    db = SessionLocal()
+    try:
+        existing = db.query(User).filter(User.email == email_clean).first()
+        if existing:
+            raise HTTPException(status_code=400, detail="Email already registered. Please sign in instead.")
+
+        user = User(
+            name=data.name.strip(),
+            email=email_clean,
+            hashed_password=hash_password(data.password),
+            role=role_clean
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+
+        user_info = {
+            "id": user.id,
+            "name": user.name,
+            "email": user.email,
+            "role": user.role
+        }
+        token = create_access_token(user_info)
+        return {
+            "message": "User registered successfully",
+            "token": token,
+            "user": user_info
+        }
+    finally:
+        db.close()
+
+
+@app.post("/auth/signin")
+def signin(data: UserSignInIn):
+    email_clean = data.email.lower().strip()
+    db = SessionLocal()
+    try:
+        user = db.query(User).filter(User.email == email_clean).first()
+        if not user or not verify_password(data.password, user.hashed_password):
+            raise HTTPException(status_code=401, detail="Invalid email or password.")
+
+        user_info = {
+            "id": user.id,
+            "name": user.name,
+            "email": user.email,
+            "role": user.role
+        }
+        token = create_access_token(user_info)
+        return {
+            "message": "Sign in successful",
+            "token": token,
+            "user": user_info
+        }
+    finally:
+        db.close()
+
+
+@app.get("/auth/me")
+def get_current_user_profile(authorization: Optional[str] = Header(None)):
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Missing or invalid token header")
+
+    token = authorization.split(" ")[1]
+    payload = decode_access_token(token)
+    if not payload:
+        raise HTTPException(status_code=401, detail="Token invalid or expired")
+
+    return {"user": payload}
+
 
 
 # ─── Helper: load CSV ─────────────────────────────────────────────────────────
