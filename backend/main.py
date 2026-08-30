@@ -1,8 +1,3 @@
-"""
-FarmMarket AI — MVP Backend
-Single-file FastAPI application.
-All routes, models, and logic are here. No microservices, no auth, no complexity.
-"""
 
 import os
 import hashlib
@@ -20,10 +15,10 @@ from pydantic import BaseModel
 from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, text
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-# ─── Load Environment Variables ──────────────────────────────────────────────
+
 load_dotenv()
 
-# ─── Config ──────────────────────────────────────────────────────────────────
+
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
     "postgresql://postgres:Password123@localhost:5432/SIH"
@@ -33,7 +28,7 @@ JWT_SECRET = os.getenv("JWT_SECRET", "farmmarket_ai_secret_key_2026_super_secure
 
 JWT_ALGORITHM = "HS256"
 
-# ─── Auth Utilities ───────────────────────────────────────────────────────────
+
 def hash_password(password: str) -> str:
     """Hash password using PBKDF2-HMAC-SHA256 with random 16-byte salt."""
     salt = os.urandom(16).hex()
@@ -77,13 +72,13 @@ def decode_access_token(token: str) -> Optional[dict]:
     except Exception:
         return None
 
-# ─── Database Setup ───────────────────────────────────────────────────────────
+
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(bind=engine)
 Base = declarative_base()
 
 
-# ─── DB Models ───────────────────────────────────────────────────────────────
+
 class User(Base):
     __tablename__ = "users"
     id            = Column(Integer, primary_key=True, index=True)
@@ -118,10 +113,10 @@ class BuyerRequest(Base):
     created_at       = Column(DateTime, default=datetime.utcnow)
 
 
-# Auto-create tables on startup (no Alembic needed)
+
 Base.metadata.create_all(bind=engine)
 
-# ─── App ──────────────────────────────────────────────────────────────────────
+
 app = FastAPI(title="FarmMarket AI MVP", version="1.0.0")
 
 app.add_middleware(
@@ -132,7 +127,7 @@ app.add_middleware(
 )
 
 
-# ─── Pydantic Schemas ─────────────────────────────────────────────────────────
+
 class UserSignUpIn(BaseModel):
     name:     str
     email:    str
@@ -163,8 +158,6 @@ class BuyerRequestIn(BaseModel):
     location:         Optional[str] = None
 
 
-# ─── Auth Endpoints ───────────────────────────────────────────────────────────
-@app.post("/auth/signup", status_code=201)
 def signup(data: UserSignUpIn):
     role_clean = data.role.lower().strip()
     if role_clean not in ["farmer", "buyer"]:
@@ -248,14 +241,13 @@ def get_current_user_profile(authorization: Optional[str] = Header(None)):
 
 
 
-# ─── Helper: load CSV ─────────────────────────────────────────────────────────
+
 def load_prices() -> pd.DataFrame:
     df = pd.read_csv(CSV_PATH, parse_dates=["date"])
     df.columns = df.columns.str.strip()
     return df
 
 
-# ─── Matching Logic ───────────────────────────────────────────────────────────
 QUALITY_RANK = {"A": 3, "B": 2, "C": 1, "Any": 0}
 
 def compute_match_score(listing: FarmerListing, req: BuyerRequest) -> dict:
@@ -273,7 +265,7 @@ def compute_match_score(listing: FarmerListing, req: BuyerRequest) -> dict:
     reasons = [f"Same crop: {listing.crop}"]
     score = 0
 
-    # Quantity (30 pts)
+
     ratio = listing.quantity / req.required_quantity if req.required_quantity > 0 else 0
     if 0.9 <= ratio <= 1.5:
         score += 30
@@ -285,7 +277,7 @@ def compute_match_score(listing: FarmerListing, req: BuyerRequest) -> dict:
         score += 5
         reasons.append(f"Quantity below requirement ({listing.quantity} Q vs {req.required_quantity} Q needed)")
 
-    # Quality (20 pts)
+
     if req.required_quality == "Any":
         score += 20
         reasons.append("Buyer accepts any quality grade")
@@ -317,7 +309,7 @@ def compute_match_score(listing: FarmerListing, req: BuyerRequest) -> dict:
     return {"score": round(score), "reasons": reasons}
 
 
-# ─── Routes ───────────────────────────────────────────────────────────────────
+
 
 @app.get("/")
 def root():
@@ -522,7 +514,7 @@ def get_recommendation(farmer_id: int):
         if not listing:
             raise HTTPException(status_code=404, detail=f"Farmer listing {farmer_id} not found")
 
-        # ── Best Buyer Offer ──────────────────────────────────────────────────
+        
         buyers = db.query(BuyerRequest).filter(
             BuyerRequest.crop.ilike(listing.crop)
         ).all()
@@ -535,7 +527,7 @@ def get_recommendation(farmer_id: int):
                 best_buyer_score = match["score"]
                 best_buyer = b
 
-        # ── Best Mandi Price ──────────────────────────────────────────────────
+        
         try:
             df = load_prices()
             crop_prices = df[df["crop"].str.lower() == listing.crop.lower()]
@@ -551,7 +543,7 @@ def get_recommendation(farmer_id: int):
             best_mandi = None
             best_mandi_price = 0
 
-        # ── Build Recommendation ──────────────────────────────────────────────
+        
         buyer_price  = best_buyer.offered_price if best_buyer else 0
         mandi_price  = best_mandi_price
 
