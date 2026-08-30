@@ -3,7 +3,7 @@
  * All JavaScript in one file. Talks to FastAPI backend at localhost:8000.
  */
 
-const API = 'http://localhost:8000';
+const API = "http://192.168.1.15:8000";
 
 // ── Auth State & Helper Functions ─────────────────────────────────────────────
 function getAuthToken() { return localStorage.getItem('auth_token'); }
