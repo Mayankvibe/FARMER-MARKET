@@ -5,29 +5,110 @@
 
 const API = 'http://localhost:8000';
 
+// ── Auth State & Helper Functions ─────────────────────────────────────────────
+function getAuthToken() { return localStorage.getItem('auth_token'); }
+function getAuthUser() {
+  try { return JSON.parse(localStorage.getItem('auth_user')); } catch(e) { return null; }
+}
+function setAuth(token, user) {
+  localStorage.setItem('auth_token', token);
+  localStorage.setItem('auth_user', JSON.stringify(user));
+  updateAuthUI();
+}
+function logout() {
+  localStorage.removeItem('auth_token');
+  localStorage.removeItem('auth_user');
+  updateAuthUI();
+  showSection('sec-home');
+}
+
+function updateAuthUI() {
+  const user = getAuthUser();
+  const navAuth = document.getElementById('nav-auth');
+  if (!navAuth) return;
+
+  if (user) {
+    const roleLabel = user.role === 'farmer' ? 'Farmer/Seller' : 'Buyer';
+    navAuth.innerHTML = `
+      <span class="user-badge">👤 ${user.name} (${roleLabel})</span>
+      <button class="btn btn-secondary btn-sm" onclick="logout()">Logout</button>
+    `;
+
+    // Pre-fill user name in forms if empty
+    if (user.role === 'farmer') {
+      const flName = document.getElementById('fl-name');
+      if (flName && !flName.value) flName.value = user.name;
+    } else if (user.role === 'buyer') {
+      const brName = document.getElementById('br-name');
+      if (brName && !brName.value) brName.value = user.name;
+    }
+  } else {
+    navAuth.innerHTML = `
+      <button class="btn btn-outline btn-sm" onclick="showSection('sec-signin')">Sign In</button>
+      <button class="btn btn-primary btn-sm" onclick="showSection('sec-signup')">Sign Up</button>
+    `;
+  }
+}
+
 // ── Navigation ────────────────────────────────────────────────────────────────
 function showSection(id) {
+  let targetId = id;
+  let sec = document.getElementById(targetId);
+  
+  // Fallback to home if section ID doesn't exist
+  if (!sec) {
+    targetId = 'sec-home';
+    sec = document.getElementById(targetId);
+  }
+
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  document.querySelector(`.nav-links a[data-section="${id}"]`).classList.add('active');
 
-  // Load section data on first visit
-  if (id === 'sec-prices')      loadPrices();
-  if (id === 'sec-matches')     loadMatchSection();
-  if (id === 'sec-recommend')   loadRecommendSection();
+  if (sec) sec.classList.add('active');
+
+  const navLink = document.querySelector(`.nav-links a[data-section="${targetId}"]`);
+  if (navLink) navLink.classList.add('active');
+
+  // Load section data safely without crashing the UI
+  try {
+    if (targetId === 'sec-prices')          loadPrices();
+    if (targetId === 'sec-matches')         loadMatchSection();
+    if (targetId === 'sec-recommend')       loadRecommendSection();
+    if (targetId === 'sec-buyer-listings') loadBuyerListings();
+  } catch (err) {
+    console.error('Section data load error:', err);
+  }
+
+  // Scroll to top when section changes
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // ── API helper ────────────────────────────────────────────────────────────────
 async function apiFetch(url, options = {}) {
-  const res = await fetch(API + url, {
-    headers: { 'Content-Type': 'application/json' },
-    ...options,
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.detail || `Error ${res.status}`);
-  return data;
+  const token = getAuthToken();
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+    ...(options.headers || {})
+  };
+
+  try {
+    const res = await fetch(API + url, {
+      ...options,
+      headers,
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || `Error ${res.status}`);
+    return data;
+  } catch (err) {
+    if (err.message && (err.message.includes('fetch') || err.message.includes('NetworkError') || err.name === 'TypeError')) {
+      throw new Error('Backend server offline. Run `cd backend` then `uvicorn main:app --reload --port 8000`.');
+    }
+    throw err;
+  }
 }
+
+
 
 // ── Formatters ────────────────────────────────────────────────────────────────
 const fmt = (n) => n != null ? '₹' + Number(n).toLocaleString('en-IN') : '—';
@@ -204,23 +285,25 @@ async function submitBuyerRequest(e) {
 // ══════════════════════════════════════════════════════════════════════════════
 
 async function loadMatchSection() {
+  const elem = document.getElementById('match-farmer-id');
   const lastId = localStorage.getItem('last_farmer_id');
-  if (lastId) document.getElementById('match-farmer-id').value = lastId;
+  if (elem && lastId) elem.value = lastId;
 }
 
 async function findMatches() {
-  const farmerId = document.getElementById('match-farmer-id').value.trim();
+  const elem = document.getElementById('match-farmer-id');
+  const farmerId = elem ? elem.value.trim() : '';
   if (!farmerId) { alert('Please enter a Farmer Listing ID.'); return; }
 
-  document.getElementById('matches-container').innerHTML =
-    '<div class="loading">🔍 Finding matches...</div>';
+  const container = document.getElementById('matches-container');
+  if (container) container.innerHTML = '<div class="loading">🔍 Finding matches...</div>';
 
   try {
     const data = await apiFetch(`/matches/${farmerId}`);
     const matches = data.matches;
 
     if (!matches.length) {
-      document.getElementById('matches-container').innerHTML = `
+      if (container) container.innerHTML = `
         <div class="empty">
           <div class="empty-icon">🤝</div>
           <p>No buyer matches found for <strong>${data.crop}</strong>.</p>
@@ -257,10 +340,9 @@ async function findMatches() {
           </div>
         </div>`).join('')}`;
 
-    document.getElementById('matches-container').innerHTML = html;
+    if (container) container.innerHTML = html;
   } catch (e) {
-    document.getElementById('matches-container').innerHTML =
-      `<div class="alert alert-error">Error: ${e.message}</div>`;
+    if (container) container.innerHTML = `<div class="alert alert-error">Error: ${e.message}</div>`;
   }
 }
 
@@ -269,16 +351,19 @@ async function findMatches() {
 // ══════════════════════════════════════════════════════════════════════════════
 
 async function loadRecommendSection() {
+  const elem = document.getElementById('rec-farmer-id');
   const lastId = localStorage.getItem('last_farmer_id');
-  if (lastId) document.getElementById('rec-farmer-id').value = lastId;
+  if (elem && lastId) elem.value = lastId;
 }
 
+
 async function getRecommendation() {
-  const farmerId = document.getElementById('rec-farmer-id').value.trim();
+  const elem = document.getElementById('rec-farmer-id');
+  const farmerId = elem ? elem.value.trim() : '';
   if (!farmerId) { alert('Please enter a Farmer Listing ID.'); return; }
 
-  document.getElementById('rec-container').innerHTML =
-    '<div class="loading">🧠 Analyzing best opportunity...</div>';
+  const container = document.getElementById('rec-container');
+  if (container) container.innerHTML = '<div class="loading">🧠 Analyzing best opportunity...</div>';
 
   try {
     const r = await apiFetch(`/recommendation/${farmerId}`);
@@ -302,22 +387,133 @@ async function getRecommendation() {
         <div class="text-secondary mt-1">Government market price</div>
       </div>` : '';
 
-    document.getElementById('rec-container').innerHTML = `
-      <div style="margin-bottom:1.25rem;">
-        <div style="font-size:.8rem;font-weight:600;text-transform:uppercase;color:#6b7280;margin-bottom:.25rem;">Crop</div>
-        <div style="font-size:1.1rem;font-weight:700;">${r.crop}</div>
-        <div class="text-secondary">Your expected price: ${fmt(r.expected_price)}/quintal</div>
-      </div>
+    if (container) {
+      container.innerHTML = `
+        <div style="margin-bottom:1.25rem;">
+          <div style="font-size:.8rem;font-weight:600;text-transform:uppercase;color:#6b7280;margin-bottom:.25rem;">Crop</div>
+          <div style="font-size:1.1rem;font-weight:700;">${r.crop}</div>
+          <div class="text-secondary">Your expected price: ${fmt(r.expected_price)}/quintal</div>
+        </div>
 
-      ${r.winner === 'buyer' ? buyerCard + mandiCard : mandiCard + buyerCard}
+        ${r.winner === 'buyer' ? buyerCard + mandiCard : mandiCard + buyerCard}
 
-      <div class="alert alert-info">
-        <strong>💡 Recommendation: ${r.recommendation}</strong><br>
-        <span style="font-size:.875rem;margin-top:.5rem;display:block;">${r.explanation}</span>
-      </div>`;
+        <div class="alert alert-info">
+          <strong>💡 Recommendation: ${r.recommendation}</strong><br>
+          <span style="font-size:.875rem;margin-top:.5rem;display:block;">${r.explanation}</span>
+        </div>`;
+    }
   } catch (e) {
-    document.getElementById('rec-container').innerHTML =
-      `<div class="alert alert-error">Error: ${e.message}</div>`;
+    if (container) container.innerHTML = `<div class="alert alert-error">Error: ${e.message}</div>`;
+  }
+}
+
+
+// ══════════════════════════════════════════════════════════════════════════════
+// AUTHENTICATION HANDLERS
+// ══════════════════════════════════════════════════════════════════════════════
+
+async function handleSignIn(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btn-signin-submit');
+  const msg = document.getElementById('signin-msg');
+  btn.textContent = 'Signing in...'; btn.disabled = true;
+  msg.className = 'alert hidden'; msg.textContent = '';
+
+  const email = document.getElementById('signin-email').value;
+  const password = document.getElementById('signin-password').value;
+
+  try {
+    const data = await apiFetch('/auth/signin', {
+      method: 'POST',
+      body: JSON.stringify({ email, password })
+    });
+    setAuth(data.token, data.user);
+    msg.textContent = '✅ Sign in successful! Redirecting...';
+    msg.className = 'alert alert-success';
+    e.target.reset();
+    setTimeout(() => {
+      msg.className = 'alert hidden';
+      if (data.user.role === 'farmer') showSection('sec-farmer');
+      else showSection('sec-buyer-listings');
+    }, 600);
+  } catch (err) {
+    msg.textContent = '❌ ' + err.message;
+    msg.className = 'alert alert-error';
+  } finally {
+    btn.textContent = 'Sign In'; btn.disabled = false;
+  }
+}
+
+async function handleSignUp(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btn-signup-submit');
+  const msg = document.getElementById('signup-msg');
+  btn.textContent = 'Creating account...'; btn.disabled = true;
+  msg.className = 'alert hidden'; msg.textContent = '';
+
+  const name = document.getElementById('signup-name').value;
+  const email = document.getElementById('signup-email').value;
+  const password = document.getElementById('signup-password').value;
+  const role = document.getElementById('signup-role').value;
+
+  try {
+    const data = await apiFetch('/auth/signup', {
+      method: 'POST',
+      body: JSON.stringify({ name, email, password, role })
+    });
+    setAuth(data.token, data.user);
+    msg.textContent = '✅ Account created successfully! Redirecting...';
+    msg.className = 'alert alert-success';
+    e.target.reset();
+    setTimeout(() => {
+      msg.className = 'alert hidden';
+      if (data.user.role === 'farmer') showSection('sec-farmer');
+      else showSection('sec-buyer-listings');
+    }, 600);
+  } catch (err) {
+    msg.textContent = '❌ ' + err.message;
+    msg.className = 'alert alert-error';
+  } finally {
+    btn.textContent = 'Sign Up'; btn.disabled = false;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// BUYER VIEW — AVAILABLE FARMER LISTINGS
+// ══════════════════════════════════════════════════════════════════════════════
+
+async function loadBuyerListings() {
+  const tbody = document.getElementById('buyer-listings-table-body');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="7" class="loading">Loading listings...</td></tr>';
+
+  const filterCropElem = document.getElementById('filter-buyer-listings-crop');
+  const cropFilter = filterCropElem ? filterCropElem.value : '';
+
+  try {
+    let listings = await apiFetch('/farmer-listing');
+    if (cropFilter) {
+      listings = listings.filter(l => l.crop.toLowerCase() === cropFilter.toLowerCase());
+    }
+
+    if (!listings || !listings.length) {
+      tbody.innerHTML = '<tr><td colspan="7" class="empty">No farmer listings found.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = listings.map(l => `
+      <tr>
+        <td><strong>#${l.id}</strong></td>
+        <td>${l.farmer_name}</td>
+        <td><strong>${l.crop}</strong></td>
+        <td>${l.quantity} Q</td>
+        <td>${qualityBadge(l.quality)}</td>
+        <td><strong style="color:#15803d;font-size:1rem;">${fmt(l.expected_price)}</strong></td>
+        <td>${l.location || '—'}</td>
+      </tr>
+    `).join('');
+  } catch (err) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="alert alert-error">Error loading listings: ${err.message}</div></td></tr>`;
   }
 }
 
@@ -332,15 +528,30 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Attach forms
-  document.getElementById('farmer-form').addEventListener('submit', submitFarmerListing);
-  document.getElementById('buyer-form').addEventListener('submit', submitBuyerRequest);
+  const farmerForm = document.getElementById('farmer-form');
+  if (farmerForm) farmerForm.addEventListener('submit', submitFarmerListing);
+
+  const buyerForm = document.getElementById('buyer-form');
+  if (buyerForm) buyerForm.addEventListener('submit', submitBuyerRequest);
+
+  const signinForm = document.getElementById('signin-form');
+  if (signinForm) signinForm.addEventListener('submit', handleSignIn);
+
+  const signupForm = document.getElementById('signup-form');
+  if (signupForm) signupForm.addEventListener('submit', handleSignUp);
 
   // Chart controls
-  document.getElementById('chart-crop').addEventListener('change', () =>
-    loadTrendChart(document.getElementById('chart-crop').value, document.getElementById('chart-market').value));
-  document.getElementById('chart-market').addEventListener('change', () =>
-    loadTrendChart(document.getElementById('chart-crop').value, document.getElementById('chart-market').value));
+  const chartCrop = document.getElementById('chart-crop');
+  const chartMarket = document.getElementById('chart-market');
+  if (chartCrop && chartMarket) {
+    chartCrop.addEventListener('change', () => loadTrendChart(chartCrop.value, chartMarket.value));
+    chartMarket.addEventListener('change', () => loadTrendChart(chartCrop.value, chartMarket.value));
+  }
+
+  // Initialize Auth UI state
+  updateAuthUI();
 
   // Start on home
   showSection('sec-home');
 });
+

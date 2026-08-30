@@ -12,16 +12,22 @@
 
 <!-- ── NAVIGATION ──────────────────────────────────────────────────────────── -->
 <nav>
-  <div class="brand">🌾 FarmMarket AI</div>
+  <div class="brand" onclick="showSection('sec-home')" style="cursor:pointer;">🌾 FarmMarket </div>
   <div class="nav-links">
     <a data-section="sec-home"     class="active">Home</a>
-    <a data-section="sec-prices">  📊 Market Prices</a>
-    <a data-section="sec-farmer">  🌱 Sell Crop</a>
-    <a data-section="sec-buyer">   🏭 Buy Crop</a>
-    <a data-section="sec-matches"> 🤝 Match Results</a>
-    <a data-section="sec-recommend">🏆 Recommendation</a>
+    <a data-section="sec-prices">   Market Prices</a>
+    <a data-section="sec-farmer"   class="nav-farmer"> Sell Crop</a>
+    <a data-section="sec-buyer"    class="nav-buyer"> Buy Crop</a>
+    <a data-section="sec-buyer-listings" class="nav-buyer"> Available Listings</a>
+    <a data-section="sec-matches"  class="nav-farmer"> Match Results</a>
+    <a data-section="sec-recommend" class="nav-farmer"> Recommendation</a>
+  </div>
+  <div class="nav-auth" id="nav-auth">
+    <button class="btn btn-outline btn-sm" onclick="showSection('sec-signin')">Sign In</button>
+    <button class="btn btn-primary btn-sm" onclick="showSection('sec-signup')">Sign Up</button>
   </div>
 </nav>
+
 
 <!-- ══════════════════════════════════════════════════════════════════════════ -->
 <!-- SECTION 1 — HOME -->
@@ -69,24 +75,86 @@
   <!-- Demo Guide -->
   <div class="card">
     <div class="card-header">
-      <div class="card-title">🚀 How to Demo This App</div>
+      <!-- kya dalu -->
+      <div class="card-title"></div>
     </div>
     <ol style="font-size:.9rem;line-height:2;padding-left:1.25rem;color:#374151;">
-      <li>Click <strong>Market Prices</strong> to view current mandi rates for Tomato, Potato, Onion, Paddy, Wheat.</li>
-      <li>Click <strong>Sell Crop</strong> → fill the farmer form → submit → <em>note your Listing ID</em>.</li>
-      <li>Click <strong>Buy Crop</strong> → fill a buyer request for the same crop.</li>
-      <li>Click <strong>Match Results</strong> → enter your Listing ID → see all matching buyers with scores.</li>
-      <li>Click <strong>Recommendation</strong> → enter your Listing ID → see which is better: buyer or mandi.</li>
+      
+      
     </ol>
   </div>
 </div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!-- AUTH SECTIONS — SIGN IN & SIGN UP -->
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-signin">
+  <div class="auth-wrapper">
+    <div class="card auth-card">
+      <div class="card-title text-center mb-1" style="font-size:1.4rem;">🔑 Sign In</div>
+      <p class="text-secondary text-center mb-2">Welcome back to FarmMarket AI</p>
+      <div id="signin-msg" class="alert hidden"></div>
+      <form id="signin-form">
+        <div class="form-group">
+          <label for="signin-email">Email Address *</label>
+          <input id="signin-email" type="email" placeholder="name@example.com" required>
+        </div>
+        <div class="form-group">
+          <label for="signin-password">Password *</label>
+          <input id="signin-password" type="password" placeholder="••••••••" required>
+        </div>
+        <button type="submit" id="btn-signin-submit" class="btn btn-primary btn-full mb-2">Sign In</button>
+      </form>
+      <div class="text-center text-secondary" style="font-size:.85rem;">
+        Don't have an account? <a href="#" onclick="showSection('sec-signup'); return false;" style="color:#16a34a;font-weight:600;">Sign Up here</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="sec-signup">
+  <div class="auth-wrapper">
+    <div class="card auth-card">
+      <div class="card-title text-center mb-1" style="font-size:1.4rem;">🌱 Create an Account</div>
+      <p class="text-secondary text-center mb-2">Join as a Farmer/Seller or Buyer</p>
+      <div id="signup-msg" class="alert hidden"></div>
+      <form id="signup-form">
+        <div class="form-group">
+          <label for="signup-name">Full Name / FPO / Company *</label>
+          <input id="signup-name" type="text" placeholder="e.g. Ramesh Sahu or ABC Foods" required>
+        </div>
+        <div class="form-group">
+          <label for="signup-email">Email Address *</label>
+          <input id="signup-email" type="email" placeholder="name@example.com" required>
+        </div>
+        <div class="form-group">
+          <label for="signup-password">Password *</label>
+          <input id="signup-password" type="password" placeholder="Min. 4 characters" required>
+        </div>
+        <div class="form-group">
+          <label for="signup-role">I am a: *</label>
+          <select id="signup-role" required>
+            <option value="farmer">🌾 Farmer / Seller (Selling crops)</option>
+            <option value="buyer">🏭 Buyer (Purchasing crops)</option>
+          </select>
+        </div>
+        <button type="submit" id="btn-signup-submit" class="btn btn-primary btn-full mb-2">Sign Up</button>
+      </form>
+      <div class="text-center text-secondary" style="font-size:.85rem;">
+        Already have an account? <a href="#" onclick="showSection('sec-signin'); return false;" style="color:#16a34a;font-weight:600;">Sign In here</a>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <!-- ══════════════════════════════════════════════════════════════════════════ -->
 <!-- SECTION 2 — MARKET PRICES -->
 <!-- ══════════════════════════════════════════════════════════════════════════ -->
 <div class="section" id="sec-prices">
   <div class="section-title">📊 Market Prices</div>
-  <div class="section-subtitle">Current mandi modal prices from government data (CSV). Filter by crop or market.</div>
+  
 
   <!-- Filters -->
   <div class="filters">
@@ -169,7 +237,7 @@
             <label for="fl-crop">Crop *</label>
             <select id="fl-crop" required>
               <option value="">Select crop</option>
-              <option>Tomato</option><option>Potato</option>
+              
               <option>Onion</option><option>Paddy</option><option>Wheat</option>
             </select>
           </div>
@@ -300,6 +368,48 @@
 </div>
 
 <!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!-- BUYER VIEW — AVAILABLE FARMER LISTINGS -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-buyer-listings">
+  <div class="section-title">🌾 Available Farmer Listings</div>
+  <div class="section-subtitle">Browse active crop listings created by farmers. Find available crops and pricing details.</div>
+
+  <div class="filters">
+    <div class="filter-group">
+      <label class="filter-label">Filter by Crop</label>
+      <select id="filter-buyer-listings-crop" class="form-control" onchange="loadBuyerListings()">
+        <option value="">All Crops</option>
+        <option>Tomato</option><option>Potato</option>
+        <option>Onion</option><option>Paddy</option><option>Wheat</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" onclick="loadBuyerListings()">Refresh Listings</button>
+  </div>
+
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Farmer / Seller</th>
+            <th>Crop</th>
+            <th>Quantity (Q)</th>
+            <th>Grade</th>
+            <th>Expected Price (₹/Q)</th>
+            <th>Location</th>
+          </tr>
+        </thead>
+        <tbody id="buyer-listings-table-body">
+          <tr><td colspan="7" class="loading">Loading listings...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
 <!-- SECTION 5 — MATCH RESULTS -->
 <!-- ══════════════════════════════════════════════════════════════════════════ -->
 <div class="section" id="sec-matches">
@@ -350,16 +460,7 @@
     </div>
   </div>
 
-  <div class="card mt-2" style="border:1px solid #fde68a;background:#fffbeb;">
-    <div style="font-size:.8rem;font-weight:700;color:#d97706;margin-bottom:.375rem;">ℹ️ How recommendations work</div>
-    <p style="font-size:.8rem;color:#78350f;line-height:1.6;">
-      The system takes your crop and compares: (1) the highest offered price from all active buyer requests, 
-      and (2) the highest current modal price from the mandi data CSV. 
-      If the buyer offers more, you're recommended to sell to the buyer. Otherwise, go to the mandi. 
-      This is a rule-based comparison — simple, transparent, and explainable.
-    </p>
-  </div>
-</div>
+ 
 
 <script src="script.js"></script>
 </body>
