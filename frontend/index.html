@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FarmMarket AI — Smart Crop Selling Platform</title>
-  <meta name="description" content="FarmMarket AI helps farmers find the best selling opportunity by comparing mandi prices and buyer demand.">
+  <title>Smart Mandi — Smart Crop Selling Platform</title>
+  <meta name="description" content="Smart Mandi helps farmers find the best selling opportunity by comparing mandi prices and buyer demand.">
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 </head>
@@ -12,14 +12,13 @@
 
 <!-- ── NAVIGATION ──────────────────────────────────────────────────────────── -->
 <nav>
-  <div class="brand" onclick="showSection('sec-home')" style="cursor:pointer;">🌾 FarmMarket </div>
+  <div class="brand" onclick="showSection('sec-home')" style="cursor:pointer;">🌾 Smart Mandi </div>
   <div class="nav-links">
     <a data-section="sec-home"     class="active">Home</a>
     <a data-section="sec-prices">   Market Prices</a>
     <a data-section="sec-farmer"   class="nav-farmer"> Sell Crop</a>
     <a data-section="sec-buyer"    class="nav-buyer"> Buy Crop</a>
     <a data-section="sec-buyer-listings" class="nav-buyer"> Available Listings</a>
-    <a data-section="sec-matches"  class="nav-farmer"> Match Results</a>
     <a data-section="sec-recommend" class="nav-farmer"> Recommendation</a>
   </div>
   <div class="nav-auth" id="nav-auth">
@@ -35,19 +34,8 @@
 <div class="section active" id="sec-home">
   <div class="hero">
     <h1>Know <span>when, where,</span><br>and to whom to sell.</h1>
-    <p>FarmMarket AI compares mandi prices with verified buyer demand to recommend the best selling opportunity for your crop.</p>
-    <div class="flow-steps">
-      <div class="flow-step">🌾 Farmer lists crop</div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-step">📊 Views market prices</div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-step">🏭 Buyer posts demand</div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-step">🤝 System matches them</div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-step">🏆 Best option shown</div>
-    </div>
-    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+    <p>Smart Mandi compares mandi prices with verified buyer demand to recommend the best selling opportunity for your crop.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:1.25rem;">
       <button class="btn btn-lg" style="background:white;color:#15803d;font-weight:700;" onclick="showSection('sec-farmer')">🌱 I'm a Farmer</button>
       <button class="btn btn-lg" style="background:rgba(255,255,255,.15);color:white;border:2px solid rgba(255,255,255,.5);" onclick="showSection('sec-buyer')">🏭 I'm a Buyer</button>
     </div>
@@ -72,16 +60,92 @@
     </div>
   </div>
 
-  <!-- Demo Guide -->
-  <div class="card">
-    <div class="card-header">
-      <!-- kya dalu -->
-      <div class="card-title"></div>
+  <!-- Agricultural Marketplace Visual Showcase -->
+  <div class="home-section-header">
+    <h2>🌱 Agricultural Marketplace Showcase</h2>
+    <p>Explore live crop categories, verified buyer demand, and agricultural listings across Chhattisgarh</p>
+  </div>
+
+  <div class="agri-grid mb-3">
+    <!-- Card 1: Wheat & Grains -->
+    <div class="agri-card" onclick="showSection('sec-prices')">
+      <div class="agri-card-img" style="background-image: url('images/wheat_field.png');">
+        <span class="agri-badge">Top Demand</span>
+      </div>
+      <div class="agri-card-body">
+        <div class="agri-card-title">Golden Wheat & Grains</div>
+        <div class="agri-card-meta">
+          <span>🌾 High Mandi Demand</span>
+          <span class="agri-price">₹2,250 / Q</span>
+        </div>
+        <p>Verified daily modal prices across Raipur, Durg, Bhilai, and Bilaspur mandis.</p>
+        <div class="agri-card-action">View Market Prices →</div>
+      </div>
     </div>
-    <ol style="font-size:.9rem;line-height:2;padding-left:1.25rem;color:#374151;">
-      
-      
-    </ol>
+
+    <!-- Card 2: Fresh Farm Produce -->
+    <div class="agri-card" onclick="showSection('sec-buyer-listings')">
+      <div class="agri-card-img" style="background-image: url('images/vegetables.png');">
+        <span class="agri-badge badge-grade">Grade A Produce</span>
+      </div>
+      <div class="agri-card-body">
+        <div class="agri-card-title">Fresh Tomatoes & Vegetables</div>
+        <div class="agri-card-meta">
+          <span>🍅 Farmer Listings</span>
+          <span class="agri-price">₹1,450 / Q</span>
+        </div>
+        <p>Browse active crop listings from local farmers and FPOs ready for immediate sale.</p>
+        <div class="agri-card-action">Browse Available Listings →</div>
+      </div>
+    </div>
+
+    <!-- Card 3: Farm Machinery & Supply Chain -->
+    <div class="agri-card" onclick="showSection('sec-farmer')">
+      <div class="agri-card-img" style="background-image: url('images/machinery.png');">
+        <span class="agri-badge badge-tech">Smart Trade</span>
+      </div>
+      <div class="agri-card-body">
+        <div class="agri-card-title">Bulk Produce & Machinery</div>
+        <div class="agri-card-meta">
+          <span>🚜 Direct Supply Chain</span>
+          <span class="agri-price">Direct Trade</span>
+        </div>
+        <p>Sell your harvested crop directly to verified food processors and agricultural buyers.</p>
+        <div class="agri-card-action">Sell Your Crop Now →</div>
+      </div>
+    </div>
+
+    <!-- Card 4: Seed & Quality Cultivation -->
+    <div class="agri-card" onclick="showSection('sec-buyer')">
+      <div class="agri-card-img" style="background-image: url('images/sprouts.png');">
+        <span class="agri-badge badge-quality">Certified Quality</span>
+      </div>
+      <div class="agri-card-body">
+        <div class="agri-card-title">Organic Paddy & Sprouts</div>
+        <div class="agri-card-meta">
+          <span>🌱 Quality Matched</span>
+          <span class="agri-price">₹2,100 / Q</span>
+        </div>
+        <p>Post your buying requirements to connect with farmers meeting your quality criteria.</p>
+        <div class="agri-card-action">Post Buyer Demand →</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Agri Stats Banner -->
+  <div class="agri-stats-banner">
+    <div class="agri-stat-item">
+      <div class="agri-stat-num">4 Major</div>
+      <div class="agri-stat-label">Government Mandis Monitored</div>
+    </div>
+    <div class="agri-stat-item">
+      <div class="agri-stat-num">100 Pts</div>
+      <div class="agri-stat-label">AI Compatibility Match Engine</div>
+    </div>
+    <div class="agri-stat-item">
+      <div class="agri-stat-num">Real-Time</div>
+      <div class="agri-stat-label">Smart Recommendation System</div>
+    </div>
   </div>
 </div>
 
@@ -93,7 +157,7 @@
   <div class="auth-wrapper">
     <div class="card auth-card">
       <div class="card-title text-center mb-1" style="font-size:1.4rem;">🔑 Sign In</div>
-      <p class="text-secondary text-center mb-2">Welcome back to FarmMarket AI</p>
+      <p class="text-secondary text-center mb-2">Welcome back to Smart Mandi</p>
       <div id="signin-msg" class="alert hidden"></div>
       <form id="signin-form">
         <div class="form-group">
@@ -127,6 +191,10 @@
         <div class="form-group">
           <label for="signup-email">Email Address *</label>
           <input id="signup-email" type="email" placeholder="name@example.com" required>
+        </div>
+        <div class="form-group">
+          <label for="signup-phone">Mobile / Contact Number *</label>
+          <input id="signup-phone" type="tel" placeholder="e.g. 9876543210" required pattern="[0-9]{10}">
         </div>
         <div class="form-group">
           <label for="signup-password">Password *</label>
@@ -232,12 +300,16 @@
           <label for="fl-name">Your Name / FPO Name *</label>
           <input id="fl-name" type="text" placeholder="e.g. Ramesh Sahu" required>
         </div>
+        <div class="form-group">
+          <label for="fl-phone">Contact / Mobile Number *</label>
+          <input id="fl-phone" type="tel" placeholder="e.g. 9876543210" required pattern="[0-9]{10}">
+        </div>
         <div class="form-row">
           <div class="form-group">
             <label for="fl-crop">Crop *</label>
             <select id="fl-crop" required>
               <option value="">Select crop</option>
-              
+              <option>Tomato</option><option>Potato</option>
               <option>Onion</option><option>Paddy</option><option>Wheat</option>
             </select>
           </div>
@@ -312,6 +384,10 @@
         <div class="form-group">
           <label for="br-name">Company / Buyer Name *</label>
           <input id="br-name" type="text" placeholder="e.g. ABC Food Processors" required>
+        </div>
+        <div class="form-group">
+          <label for="br-phone">Contact / Mobile Number *</label>
+          <input id="br-phone" type="tel" placeholder="e.g. 9876543210" required pattern="[0-9]{10}">
         </div>
         <div class="form-row">
           <div class="form-group">
@@ -398,10 +474,11 @@
             <th>Grade</th>
             <th>Expected Price (₹/Q)</th>
             <th>Location</th>
+            <th>Contact Number</th>
           </tr>
         </thead>
         <tbody id="buyer-listings-table-body">
-          <tr><td colspan="7" class="loading">Loading listings...</td></tr>
+          <tr><td colspan="8" class="loading">Loading listings...</td></tr>
         </tbody>
       </table>
     </div>
@@ -410,39 +487,13 @@
 
 
 <!-- ══════════════════════════════════════════════════════════════════════════ -->
-<!-- SECTION 5 — MATCH RESULTS -->
-<!-- ══════════════════════════════════════════════════════════════════════════ -->
-<div class="section" id="sec-matches">
-  <div class="section-title">🤝 Match Results</div>
-  <div class="section-subtitle">Enter your Farmer Listing ID to see all matching buyer requests, ranked by score.</div>
-
-  <div class="card mb-3">
-    <div style="display:flex;gap:1rem;align-items:flex-end;flex-wrap:wrap;">
-      <div style="flex:1;min-width:200px;">
-        <label style="display:block;font-size:.85rem;font-weight:600;margin-bottom:.35rem;">Farmer Listing ID</label>
-        <input id="match-farmer-id" type="number" placeholder="Enter your listing ID (e.g. 1)" style="max-width:280px;">
-      </div>
-      <button class="btn btn-primary" onclick="findMatches()">🔍 Find Matches</button>
-    </div>
-    <p class="text-secondary mt-1" style="font-size:.8rem;">You received your Listing ID after submitting the Sell Crop form.</p>
-  </div>
-
-  <div id="matches-container">
-    <div class="empty">
-      <div class="empty-icon">🤝</div>
-      <p>Enter your Farmer Listing ID above and click "Find Matches".</p>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════════════════════════════════════════ -->
-<!-- SECTION 6 — SMART RECOMMENDATION -->
+<!-- SECTION — SMART RECOMMENDATION -->
 <!-- ══════════════════════════════════════════════════════════════════════════ -->
 <div class="section" id="sec-recommend">
   <div class="section-title">🏆 Smart Selling Recommendation</div>
   <div class="section-subtitle">The system compares the best buyer offer vs the best mandi price, and recommends the winner.</div>
 
-  <div class="card mb-3">
+  <div class="card mb-3" id="rec-input-card">
     <div style="display:flex;gap:1rem;align-items:flex-end;flex-wrap:wrap;">
       <div style="flex:1;min-width:200px;">
         <label style="display:block;font-size:.85rem;font-weight:600;margin-bottom:.35rem;">Farmer Listing ID</label>
@@ -453,10 +504,13 @@
   </div>
 
   <div id="rec-container">
-    <div class="empty">
-      <div class="empty-icon">🏆</div>
-      <p>Enter your Farmer Listing ID above to get your personalized recommendation.</p>
-      <p class="text-secondary mt-1">The system will compare the best buyer offer with the current best mandi price for your crop.</p>
+    <div class="card text-center" style="padding: 2.5rem; text-align: center; background: white; border-radius: 14px;">
+      <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">🏆</div>
+      <h3 style="margin-bottom: 0.5rem; font-weight: 800; color: #0f172a;">Smart Selling Recommendation</h3>
+      <p class="text-secondary mb-3" style="max-width: 520px; margin: 0 auto 1.25rem; line-height: 1.5;">
+        Enter your Farmer Listing ID above and click <strong>"Get Recommendation"</strong> to view AI-powered price analysis, Mandi comparisons, and buyer opportunities.
+      </p>
+      <button class="btn btn-primary" onclick="showSection('sec-farmer')">🌱 Sell Crop / Create Listing</button>
     </div>
   </div>
 

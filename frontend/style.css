@@ -1,63 +1,80 @@
 /* FarmMarket AI — MVP Stylesheet */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Inter', sans-serif; background: #f0fdf4; color: #111827; }
+body { 
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+  background: #f4fbf6; 
+  color: #0f172a; 
+  -webkit-font-smoothing: antialiased;
+}
 
 /* ── NAV ── */
 nav {
-  background: #fff;
-  border-bottom: 1px solid #e5e7eb;
-  padding: .875rem 1.5rem;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid #e2e8f0;
+  padding: 0.85rem 2rem;
   display: flex; align-items: center; justify-content: space-between;
   position: sticky; top: 0; z-index: 100;
-  box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  box-shadow: 0 4px 20px -5px rgba(0,0,0,.05);
 }
-.brand { font-size: 1.2rem; font-weight: 800; color: #15803d; }
-.nav-links { display: flex; gap: .25rem; }
-.nav-links a {
-  padding: .45rem .85rem; border-radius: 8px;
-  font-size: .85rem; font-weight: 500; color: #374151; cursor: pointer;
-  border: none; background: none; text-decoration: none;
+.brand { 
+  font-size: 1.25rem; 
+  font-weight: 800; 
+  color: #15803d; 
+  letter-spacing: -0.025em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: transform 0.2s ease;
 }
-.nav-links a:hover, .nav-links a.active { background: #f0fdf4; color: #15803d; }
+.brand:hover { transform: translateY(-1px); }
 
-.nav-auth { display: flex; align-items: center; gap: .5rem; }
+.nav-links { display: flex; align-items: center; gap: 0.35rem; }
+.nav-links a {
+  padding: 0.5rem 0.85rem; border-radius: 8px;
+  font-size: 0.85rem; font-weight: 600; letter-spacing: -0.01em; color: #475569; cursor: pointer;
+  border: none; background: none; text-decoration: none;
+  transition: all 0.2s ease;
+}
+.nav-links a:hover { background: #f0fdf4; color: #15803d; }
+.nav-links a.active { background: #dcfce7; color: #166534; font-weight: 700; }
+
+.nav-auth { display: flex; align-items: center; gap: 0.6rem; }
 .user-badge {
   display: inline-flex; align-items: center; gap: .35rem;
   background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d;
-  padding: .35rem .75rem; border-radius: 999px; font-weight: 600; font-size: .82rem;
+  padding: .4rem .85rem; border-radius: 999px; font-weight: 600; font-size: .82rem;
 }
-.btn-sm { padding: .35rem .75rem; font-size: .8rem; }
+.btn-sm { padding: .4rem .85rem; font-size: .82rem; border-radius: 7px; }
 .auth-wrapper { display: flex; justify-content: center; margin-top: 1rem; }
 .auth-card { max-width: 440px; width: 100%; padding: 2rem; }
 .text-center { text-align: center; }
-
 
 /* ── SECTIONS ── */
 .section { display: none; max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
 .section.active { display: block; }
 
-.section-title { font-size: 1.4rem; font-weight: 700; margin-bottom: .4rem; }
-.section-subtitle { font-size: .9rem; color: #6b7280; margin-bottom: 1.5rem; }
+.section-title { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; color: #0f172a; margin-bottom: .4rem; }
+.section-subtitle { font-size: .925rem; color: #64748b; margin-bottom: 1.5rem; }
 
 /* ── HERO ── */
 .hero {
-  background: linear-gradient(135deg, #064e3b, #065f46, #047857);
-  color: white; padding: 4rem 2rem; text-align: center;
-  border-radius: 16px; margin-bottom: 2rem;
+  position: relative;
+  background: linear-gradient(135deg, rgba(6, 78, 59, 0.92), rgba(4, 120, 87, 0.88)), url('images/hero_farm.png') center/cover no-repeat;
+  color: white; 
+  padding: 3rem 2rem; 
+  text-align: center;
+  border-radius: 20px; 
+  margin-bottom: 1.5rem;
+  box-shadow: 0 10px 25px -5px rgba(6, 78, 59, 0.25);
+  overflow: hidden;
 }
-.hero h1 { font-size: 2.5rem; font-weight: 800; margin-bottom: .75rem; }
-.hero h1 span { color: #4ade80; }
-.hero p { font-size: 1.05rem; opacity: .85; max-width: 600px; margin: 0 auto 2rem; }
-.flow-steps {
-  display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin-bottom: 2rem;
-}
-.flow-step {
-  background: rgba(255,255,255,.12); border-radius: 10px;
-  padding: .625rem 1rem; font-size: .85rem; font-weight: 500;
-}
-.flow-arrow { color: #4ade80; align-self: center; font-size: 1.2rem; }
+.hero h1 { font-size: 2.5rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: .6rem; line-height: 1.25; }
+.hero h1 span { color: #86efac; text-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+.hero p { font-size: 1.05rem; opacity: .92; max-width: 640px; margin: 0 auto 1.25rem; line-height: 1.5; font-weight: 400; }
 
 /* ── CARDS ── */
 .card {
@@ -150,15 +167,24 @@ tbody tr:last-child td { border-bottom: none; }
 
 /* ── RECOMMENDATION ── */
 .rec-box {
-  border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem;
+  border-radius: 14px; padding: 1.5rem; margin-bottom: 1rem;
 }
-.rec-winner { background: linear-gradient(135deg,#f0fdf4,#dcfce7); border: 2px solid #22c55e; }
-.rec-runner { background: #f9fafb; border: 1px solid #e5e7eb; }
+.rec-winner { background: linear-gradient(135deg,#f0fdf4,#dcfce7); border: 2px solid #22c55e; box-shadow: 0 4px 15px rgba(34,197,94,0.12); }
+.rec-runner { background: #ffffff; border: 1px solid #e2e8f0; }
 .rec-title { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #15803d; margin-bottom: .5rem; }
 .rec-name { font-size: 1.25rem; font-weight: 800; margin-bottom: .5rem; }
 .rec-price { font-size: 1.75rem; font-weight: 800; color: #15803d; }
 .rec-price small { font-size: .8rem; font-weight: 400; color: #6b7280; }
 .rec-explanation { font-size: .875rem; color: #374151; margin-top: .75rem; line-height: 1.6; }
+
+.rec-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem 1rem;
+  font-size: 0.85rem;
+  color: #334155;
+}
+@media(max-width: 576px) { .rec-details-grid { grid-template-columns: 1fr; } }
 
 /* ── ALERTS ── */
 .alert { padding: .875rem 1rem; border-radius: 8px; font-size: .875rem; margin-bottom: 1rem; }
@@ -179,3 +205,148 @@ tbody tr:last-child td { border-bottom: none; }
 .text-secondary { color: #6b7280; font-size: .875rem; }
 .flex-between { display: flex; align-items: center; justify-content: space-between; }
 .hidden { display: none !important; }
+
+/* ── AGRICULTURAL MARKETPLACE VISUAL CONTENT ── */
+.home-section-header {
+  margin-top: 2.5rem;
+  margin-bottom: 1.25rem;
+  text-align: left;
+}
+.home-section-header h2 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+}
+.home-section-header p {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-top: 0.25rem;
+}
+
+.agri-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+}
+@media(max-width: 992px) { .agri-grid { grid-template-columns: repeat(2, 1fr); } }
+@media(max-width: 576px) { .agri-grid { grid-template-columns: 1fr; } }
+
+.agri-card {
+  background: white;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+}
+.agri-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px -6px rgba(22, 163, 74, 0.15);
+  border-color: #86efac;
+}
+
+.agri-card-img {
+  height: 150px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  border-bottom: 1px solid #f1f5f9;
+}
+.agri-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(4px);
+  color: #4ade80;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.badge-grade { color: #facc15; }
+.badge-tech { color: #38bdf8; }
+.badge-quality { color: #a7f3d0; }
+
+.agri-card-body {
+  padding: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.agri-card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 0.4rem;
+}
+.agri-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-bottom: 0.6rem;
+}
+.agri-price {
+  font-weight: 800;
+  color: #16a34a;
+  font-size: 0.875rem;
+}
+.agri-card-body p {
+  font-size: 0.825rem;
+  color: #64748b;
+  line-height: 1.45;
+  margin-bottom: 1rem;
+  flex: 1;
+}
+.agri-card-action {
+  font-size: 0.825rem;
+  font-weight: 700;
+  color: #16a34a;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.agri-card:hover .agri-card-action {
+  color: #15803d;
+  text-decoration: underline;
+}
+
+/* Agri Stats Banner */
+.agri-stats-banner {
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  border-radius: 16px;
+  padding: 1.75rem 2rem;
+  color: white;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.15);
+}
+.agri-stat-item {
+  text-align: center;
+}
+.agri-stat-num {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #4ade80;
+  line-height: 1;
+  margin-bottom: 0.35rem;
+}
+.agri-stat-label {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
