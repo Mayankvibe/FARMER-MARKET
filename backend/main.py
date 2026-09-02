@@ -84,6 +84,7 @@ class User(Base):
     id            = Column(Integer, primary_key=True, index=True)
     name          = Column(String, nullable=False)
     email         = Column(String, unique=True, index=True, nullable=False)
+    phone_number  = Column(String, nullable=True)
     hashed_password = Column(String, nullable=False)
     role          = Column(String, nullable=False)  # "farmer" or "buyer"
     created_at    = Column(DateTime, default=datetime.utcnow)
@@ -98,6 +99,7 @@ class FarmerListing(Base):
     quality       = Column(String, nullable=False)  # A / B / C
     expected_price= Column(Float, nullable=False)   # ₹ per quintal
     location      = Column(String, nullable=True)
+    contact_number= Column(String, nullable=True)
     created_at    = Column(DateTime, default=datetime.utcnow)
 
 
@@ -110,11 +112,22 @@ class BuyerRequest(Base):
     required_quality = Column(String, nullable=False)  # A / B / C / Any
     offered_price    = Column(Float, nullable=False)   # ₹ per quintal
     location         = Column(String, nullable=True)
+    contact_number   = Column(String, nullable=True)
     created_at       = Column(DateTime, default=datetime.utcnow)
 
 
 
 Base.metadata.create_all(bind=engine)
+
+# Auto-migration for existing tables
+with engine.connect() as conn:
+    try:
+        conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS phone_number VARCHAR;"))
+        conn.execute(text("ALTER TABLE farmer_listings ADD COLUMN IF NOT EXISTS contact_number VARCHAR;"))
+        conn.execute(text("ALTER TABLE buyer_requests ADD COLUMN IF NOT EXISTS contact_number VARCHAR;"))
+        conn.commit()
+    except Exception as e:
+        print("Schema migration info:", e)
 
 
 app = FastAPI(title="FarmMarket AI MVP", version="1.0.0")
@@ -129,10 +142,11 @@ app.add_middleware(
 
 
 class UserSignUpIn(BaseModel):
-    name:     str
-    email:    str
-    password: str
-    role:     str  # "farmer" or "buyer"
+    name:         str
+    email:        str
+    password:     str
+    role:         str  # "farmer" or "buyer"
+    phone_number: Optional[str] = None
 
 
 class UserSignInIn(BaseModel):
@@ -147,6 +161,7 @@ class FarmerListingIn(BaseModel):
     quality:        str
     expected_price: float
     location:       Optional[str] = None
+    contact_number: Optional[str] = None
 
 
 class BuyerRequestIn(BaseModel):
@@ -156,8 +171,10 @@ class BuyerRequestIn(BaseModel):
     required_quality: str
     offered_price:    float
     location:         Optional[str] = None
+    contact_number:   Optional[str] = None
 
 
+@app.post("/auth/signup")
 def signup(data: UserSignUpIn):
     role_clean = data.role.lower().strip()
     if role_clean not in ["farmer", "buyer"]:
@@ -166,6 +183,10 @@ def signup(data: UserSignUpIn):
     email_clean = data.email.lower().strip()
     if not email_clean or "@" not in email_clean:
         raise HTTPException(status_code=400, detail="Please enter a valid email address.")
+
+    phone_clean = (data.phone_number or "").strip()
+    if not phone_clean or len(phone_clean) < 10:
+        raise HTTPException(status_code=400, detail="Please enter a valid 10-digit mobile number.")
 
     if len(data.password) < 4:
         raise HTTPException(status_code=400, detail="Password must be at least 4 characters long.")
@@ -179,6 +200,7 @@ def signup(data: UserSignUpIn):
         user = User(
             name=data.name.strip(),
             email=email_clean,
+            phone_number=phone_clean,
             hashed_password=hash_password(data.password),
             role=role_clean
         )
@@ -190,6 +212,7 @@ def signup(data: UserSignUpIn):
             "id": user.id,
             "name": user.name,
             "email": user.email,
+            "phone_number": user.phone_number,
             "role": user.role
         }
         token = create_access_token(user_info)
@@ -215,6 +238,7 @@ def signin(data: UserSignInIn):
             "id": user.id,
             "name": user.name,
             "email": user.email,
+            "phone_number": user.phone_number,
             "role": user.role
         }
         token = create_access_token(user_info)
@@ -392,6 +416,7 @@ def create_farmer_listing(data: FarmerListingIn):
             "quality": listing.quality,
             "expected_price": listing.expected_price,
             "location": listing.location,
+            "contact_number": listing.contact_number,
         }
     finally:
         db.close()
@@ -408,6 +433,7 @@ def get_farmer_listings():
                 "id": l.id, "farmer_name": l.farmer_name, "crop": l.crop,
                 "quantity": l.quantity, "quality": l.quality,
                 "expected_price": l.expected_price, "location": l.location,
+                "contact_number": l.contact_number,
             }
             for l in listings
         ]
@@ -433,6 +459,7 @@ def create_buyer_request(data: BuyerRequestIn):
             "required_quality": req.required_quality,
             "offered_price": req.offered_price,
             "location": req.location,
+            "contact_number": req.contact_number,
         }
     finally:
         db.close()
@@ -450,6 +477,7 @@ def get_buyer_requests():
                 "required_quantity": r.required_quantity,
                 "required_quality": r.required_quality,
                 "offered_price": r.offered_price, "location": r.location,
+                "contact_number": r.contact_number,
             }
             for r in reqs
         ]
@@ -485,6 +513,7 @@ def get_matches(farmer_id: int):
                     "required_quality": b.required_quality,
                     "offered_price": b.offered_price,
                     "location": b.location,
+                    "contact_number": b.contact_number,
                     "match_score": match["score"],
                     "reasons": match["reasons"],
                 })
@@ -494,6 +523,7 @@ def get_matches(farmer_id: int):
             "farmer_id": farmer_id,
             "farmer_name": listing.farmer_name,
             "crop": listing.crop,
+            "farmer_contact": listing.contact_number,
             "matches": results,
             "total_matches": len(results),
         }
@@ -514,43 +544,70 @@ def get_recommendation(farmer_id: int):
         if not listing:
             raise HTTPException(status_code=404, detail=f"Farmer listing {farmer_id} not found")
 
-        
         buyers = db.query(BuyerRequest).filter(
             BuyerRequest.crop.ilike(listing.crop)
         ).all()
 
         best_buyer = None
         best_buyer_score = 0
+        best_buyer_reasons = []
         for b in buyers:
             match = compute_match_score(listing, b)
             if match["score"] > best_buyer_score:
                 best_buyer_score = match["score"]
                 best_buyer = b
+                best_buyer_reasons = match["reasons"]
 
-        
+        best_mandi = None
+        best_mandi_price = 0
+        best_mandi_min = 0
+        best_mandi_max = 0
+        best_mandi_district = ""
+        best_mandi_date = ""
+        market_avg_price = 0
+
         try:
             df = load_prices()
             crop_prices = df[df["crop"].str.lower() == listing.crop.lower()]
             latest_crop = crop_prices.sort_values("date", ascending=False).groupby("market").first().reset_index()
 
-            best_mandi = None
-            best_mandi_price = 0
             if not latest_crop.empty:
+                market_avg_price = float(latest_crop["modal_price"].mean())
                 best_row = latest_crop.loc[latest_crop["modal_price"].idxmax()]
-                best_mandi = best_row["market"]
+                best_mandi = str(best_row["market"])
                 best_mandi_price = float(best_row["modal_price"])
-        except Exception:
-            best_mandi = None
-            best_mandi_price = 0
+                best_mandi_min = float(best_row.get("min_price", best_mandi_price))
+                best_mandi_max = float(best_row.get("max_price", best_mandi_price))
+                best_mandi_district = str(best_row.get("district", ""))
+                best_mandi_date = str(best_row.get("date", ""))[:10]
+        except Exception as ex:
+            print("Market price fetch info:", ex)
 
-        
+        farmer_contact = listing.contact_number
+        if not farmer_contact:
+            fu = db.query(User).filter(User.name.ilike(listing.farmer_name.strip())).first()
+            if fu and fu.phone_number:
+                farmer_contact = fu.phone_number
+
+        best_buyer_contact = best_buyer.contact_number if best_buyer else None
+        if best_buyer and not best_buyer_contact:
+            bu = db.query(User).filter(User.name.ilike(best_buyer.buyer_name.strip())).first()
+            if bu and bu.phone_number:
+                best_buyer_contact = bu.phone_number
+
         buyer_price  = best_buyer.offered_price if best_buyer else 0
         mandi_price  = best_mandi_price
 
         if buyer_price == 0 and mandi_price == 0:
             return {
                 "farmer_id": farmer_id,
+                "farmer_name": listing.farmer_name,
                 "crop": listing.crop,
+                "quantity": listing.quantity,
+                "quality": listing.quality,
+                "expected_price": listing.expected_price,
+                "location": listing.location,
+                "contact_number": farmer_contact,
                 "recommendation": "No data available",
                 "explanation": "No buyer requests or market price data found for this crop.",
                 "best_buyer": None,
@@ -559,9 +616,10 @@ def get_recommendation(farmer_id: int):
 
         if buyer_price >= mandi_price and best_buyer:
             recommendation = f"Sell to {best_buyer.buyer_name}"
+            diff = round(buyer_price - mandi_price)
             explanation = (
                 f"{best_buyer.buyer_name} offers ₹{buyer_price}/quintal, "
-                f"which is ₹{round(buyer_price - mandi_price)} more than the best mandi price "
+                f"which is ₹{diff} more than the best mandi price "
                 f"(₹{mandi_price} at {best_mandi}). "
                 f"Match Score: {best_buyer_score}/100."
             )
@@ -579,23 +637,49 @@ def get_recommendation(farmer_id: int):
             explanation = f"No mandi data found. Best buyer offers ₹{buyer_price}/quintal."
             winner = "buyer"
 
+        winner_price = buyer_price if winner == "buyer" else mandi_price
+        total_payout = round(winner_price * listing.quantity, 2)
+        price_benefit = round(winner_price - market_avg_price, 2) if market_avg_price > 0 else 0
+        match_status = "Strong Match" if best_buyer_score >= 75 else ("Good Match" if best_buyer_score >= 50 else "Possible Match")
+
         return {
             "farmer_id": farmer_id,
+            "farmer_name": listing.farmer_name,
             "crop": listing.crop,
+            "quantity": listing.quantity,
+            "quality": listing.quality,
             "expected_price": listing.expected_price,
+            "location": listing.location,
+            "contact_number": farmer_contact,
             "recommendation": recommendation,
             "winner": winner,
+            "winner_price": winner_price,
+            "total_payout": total_payout,
+            "price_benefit": price_benefit,
+            "match_status": match_status,
             "explanation": explanation,
+            "market_avg_price": round(market_avg_price, 2),
             "best_buyer": {
+                "id": best_buyer.id,
                 "name": best_buyer.buyer_name,
+                "crop": best_buyer.crop,
+                "required_quantity": best_buyer.required_quantity,
+                "required_quality": best_buyer.required_quality,
                 "offered_price": buyer_price,
                 "location": best_buyer.location,
+                "contact_number": best_buyer_contact,
                 "match_score": best_buyer_score,
+                "reasons": best_buyer_reasons,
             } if best_buyer else None,
             "best_mandi": {
                 "name": best_mandi,
                 "modal_price": mandi_price,
+                "min_price": best_mandi_min,
+                "max_price": best_mandi_max,
+                "district": best_mandi_district,
+                "date": best_mandi_date,
             } if best_mandi else None,
         }
     finally:
         db.close()
+
