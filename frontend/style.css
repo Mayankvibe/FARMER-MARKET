@@ -349,4 +349,290 @@ tbody tr:last-child td { border-bottom: none; }
   color: #94a3b8;
   font-weight: 500;
 }
+/* ================================
+   MOBILE RESPONSIVE FIX
+   ================================ */
 
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* ---------- NAVBAR ---------- */
+
+@media (max-width: 900px) {
+
+    nav {
+        flex-wrap: wrap;
+        padding: 0.75rem 1rem;
+        gap: 8px;
+    }
+
+    .brand {
+        font-size: 1.1rem;
+    }
+
+    .nav-auth {
+        margin-left: auto;
+    }
+
+    .nav-links {
+        order: 3;
+        width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+        padding-bottom: 5px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .nav-links a {
+        flex-shrink: 0;
+    }
+}
+
+
+/* ---------- TABLET ---------- */
+
+@media (max-width: 768px) {
+
+    .section {
+        width: 100%;
+        padding: 1.5rem 1rem;
+    }
+
+    .hero {
+        padding: 2.2rem 1.2rem;
+    }
+
+    .hero h1 {
+        font-size: 2rem;
+    }
+
+    .hero p {
+        font-size: 0.95rem;
+    }
+
+    .grid-2,
+    .grid-3 {
+        grid-template-columns: 1fr !important;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr !important;
+    }
+
+    .agri-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+
+/* ---------- MOBILE ---------- */
+
+@media (max-width: 600px) {
+
+    .section {
+        padding: 1rem 0.75rem;
+    }
+
+    /* Navbar */
+
+    nav {
+        padding: 0.7rem 0.75rem;
+    }
+
+    .brand {
+        font-size: 1rem;
+    }
+
+    .nav-auth {
+        gap: 4px;
+    }
+
+    .nav-auth .btn {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.75rem;
+    }
+
+    .nav-links {
+        gap: 4px;
+    }
+
+    .nav-links a {
+        padding: 0.45rem 0.65rem;
+        font-size: 0.75rem;
+    }
+
+
+    /* Hero */
+
+    .hero {
+        padding: 2rem 1rem;
+        border-radius: 14px;
+    }
+
+    .hero h1 {
+        font-size: 1.65rem;
+        line-height: 1.25;
+    }
+
+    .hero p {
+        font-size: 0.85rem;
+        line-height: 1.5;
+    }
+
+
+    /* Cards */
+
+    .card {
+        padding: 1rem;
+    }
+
+
+    /* Forms */
+
+    .form-row {
+        grid-template-columns: 1fr !important;
+    }
+
+    input,
+    select,
+    textarea {
+        width: 100%;
+        font-size: 16px;
+    }
+
+
+    /* Filters */
+
+    .filters {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 0.9rem;
+    }
+
+    .filter-group {
+        width: 100%;
+        min-width: 0;
+    }
+
+
+    /* Buttons */
+
+    .btn {
+        min-height: 42px;
+    }
+
+    .btn-lg {
+        width: 100%;
+        justify-content: center;
+    }
+
+
+    /* Tables */
+
+    .table-wrap {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+        min-width: 650px;
+    }
+
+
+    /* Agricultural cards */
+
+    .agri-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .agri-card-img {
+        height: 170px;
+    }
+
+
+    /* Recommendation */
+
+    .rec-box {
+        padding: 1rem;
+    }
+
+    .rec-details-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .score-box {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .score-num {
+        text-align: left;
+    }
+
+
+    /* Chart */
+
+    .chart-box {
+        height: 220px;
+    }
+
+
+    /* Auth */
+
+    .auth-wrapper {
+        padding: 0 0.5rem;
+    }
+
+    .auth-card {
+        padding: 1.25rem;
+    }
+
+
+    /* Text */
+
+    .section-title {
+        font-size: 1.3rem;
+    }
+
+    .section-subtitle {
+        font-size: 0.82rem;
+    }
+}
+
+
+/* ---------- SMALL PHONE ---------- */
+
+@media (max-width: 380px) {
+
+    .brand {
+        font-size: 0.9rem;
+    }
+
+    .nav-auth .btn {
+        font-size: 0.7rem;
+        padding: 0.35rem 0.5rem;
+    }
+
+    .nav-links a {
+        font-size: 0.7rem;
+        padding: 0.4rem 0.55rem;
+    }
+
+    .hero h1 {
+        font-size: 1.45rem;
+    }
+
+    .section {
+        padding-left: 0.6rem;
+        padding-right: 0.6rem;
+    }
+}
