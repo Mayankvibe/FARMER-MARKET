@@ -55,6 +55,32 @@ function updateAuthUI() {
 }
 
 // ── Navigation ────────────────────────────────────────────────────────────────
+function closeMobileMenu() {
+  const navLinks = document.getElementById('nav-links');
+  const hamburgerBtn = document.getElementById('hamburger-btn');
+  if (navLinks && navLinks.classList.contains('open')) {
+    navLinks.classList.remove('open');
+  }
+  if (hamburgerBtn) {
+    hamburgerBtn.setAttribute('aria-expanded', 'false');
+    hamburgerBtn.setAttribute('aria-label', 'Open menu');
+  }
+}
+
+function toggleMobileMenu() {
+  const navLinks = document.getElementById('nav-links');
+  const hamburgerBtn = document.getElementById('hamburger-btn');
+  if (!navLinks) return;
+  const isOpen = navLinks.classList.toggle('open');
+  if (hamburgerBtn) {
+    hamburgerBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    hamburgerBtn.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
+  }
+}
+
+window.closeMobileMenu = closeMobileMenu;
+window.toggleMobileMenu = toggleMobileMenu;
+
 function showSection(id) {
   let targetId = id;
   let sec = document.getElementById(targetId);
@@ -84,7 +110,12 @@ function showSection(id) {
 
   // Scroll to top when section changes
   window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // Automatically close mobile menu if open
+  closeMobileMenu();
 }
+
+window.showSection = showSection;
 
 // ── API helper ────────────────────────────────────────────────────────────────
 async function apiFetch(url, options = {}) {
@@ -776,6 +807,23 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       showSection(a.dataset.section);
     });
+  });
+
+  // Attach hamburger toggle
+  const hamburgerBtn = document.getElementById('hamburger-btn');
+  if (hamburgerBtn) {
+    hamburgerBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleMobileMenu();
+    });
+  }
+
+  // Close mobile menu on outside click
+  document.addEventListener('click', (e) => {
+    const nav = document.querySelector('nav');
+    if (nav && !nav.contains(e.target)) {
+      closeMobileMenu();
+    }
   });
 
   // Attach forms

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Smart Mandi — Smart Crop Selling Platform</title>
   <meta name="description" content="Smart Mandi helps farmers find the best selling opportunity by comparing mandi prices and buyer demand.">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=2">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 </head>
 <body>
@@ -13,7 +13,7 @@
 <!-- ── NAVIGATION ──────────────────────────────────────────────────────────── -->
 <nav>
   <div class="brand" onclick="showSection('sec-home')" style="cursor:pointer;">🌾 Smart Mandi </div>
-  <div class="nav-links">
+  <div class="nav-links" id="nav-links">
     <a data-section="sec-home"     class="active">Home</a>
     <a data-section="sec-prices">   Market Prices</a>
     <a data-section="sec-farmer"   class="nav-farmer"> Sell Crop</a>
@@ -21,9 +21,12 @@
     <a data-section="sec-buyer-listings" class="nav-buyer"> Available Listings</a>
     <a data-section="sec-recommend" class="nav-farmer"> Recommendation</a>
   </div>
-  <div class="nav-auth" id="nav-auth">
-    <button class="btn btn-outline btn-sm" onclick="showSection('sec-signin')">Sign In</button>
-    <button class="btn btn-primary btn-sm" onclick="showSection('sec-signup')">Sign Up</button>
+  <div class="nav-actions">
+    <div class="nav-auth" id="nav-auth">
+      <button class="btn btn-outline btn-sm" onclick="showSection('sec-signin')">Sign In</button>
+      <button class="btn btn-primary btn-sm" onclick="showSection('sec-signup')">Sign Up</button>
+    </div>
+    <button class="hamburger-btn" id="hamburger-btn" aria-label="Open menu" aria-expanded="false">☰</button>
   </div>
 </nav>
 
@@ -516,6 +519,6 @@
 
  
 
-<script src="script.js"></script>
+<script src="script.js?v=2"></script>
 </body>
 </html>
