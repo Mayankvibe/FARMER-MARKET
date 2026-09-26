@@ -9,6 +9,628 @@ const API = (function() {
   return `${window.location.protocol}//${host}:8000`;
 })();
 
+// ── Internationalization (i18n) & Language State ─────────────────────────────
+const translations = {
+  en: {
+    nav: {
+      home: "Home",
+      prices: "Market Prices",
+      sell: "Sell Crop",
+      buy: "Buy Crop",
+      listings: "Available Listings",
+      recommend: "Recommendation",
+      signIn: "Sign In",
+      signUp: "Sign Up",
+      logout: "Logout",
+      farmerBadge: "Farmer/Seller",
+      buyerBadge: "Buyer"
+    },
+    hero: {
+      h1: "Know <span>when, where,</span><br>and to whom to sell.",
+      desc: "Smart Mandi compares mandi prices with verified buyer demand to recommend the best selling opportunity for your crop.",
+      btnFarmer: "🌱 I'm a Farmer",
+      btnBuyer: "🏭 I'm a Buyer"
+    },
+    feature1: {
+      title: "Live Mandi Prices",
+      desc: "Current modal prices from 4 major markets — Raipur, Durg, Bhilai, Bilaspur."
+    },
+    feature2: {
+      title: "Buyer Matching",
+      desc: "Farmers and buyers matched on crop, quantity, quality, and price. Score out of 100."
+    },
+    feature3: {
+      title: "Smart Recommendation",
+      desc: "System compares best buyer offer vs best mandi price and recommends the winner."
+    },
+    showcase: {
+      title: "🌱 Agricultural Marketplace Showcase",
+      desc: "Explore live crop categories, verified buyer demand, and agricultural listings across Chhattisgarh"
+    },
+    agri1: {
+      badge: "Top Demand",
+      title: "Golden Wheat & Grains",
+      meta: "🌾 High Mandi Demand",
+      desc: "Verified daily modal prices across Raipur, Durg, Bhilai, and Bilaspur mandis.",
+      action: "View Market Prices →"
+    },
+    agri2: {
+      badge: "Grade A Produce",
+      title: "Fresh Tomatoes & Vegetables",
+      meta: "🍅 Farmer Listings",
+      desc: "Browse active crop listings from local farmers and FPOs ready for immediate sale.",
+      action: "Browse Available Listings →"
+    },
+    agri3: {
+      badge: "Smart Trade",
+      title: "Bulk Produce & Machinery",
+      meta: "🚜 Direct Supply Chain",
+      desc: "Sell your harvested crop directly to verified food processors and agricultural buyers.",
+      action: "Sell Your Crop Now →"
+    },
+    agri4: {
+      badge: "Certified Quality",
+      title: "Organic Paddy & Sprouts",
+      meta: "🌱 Quality Matched",
+      desc: "Post your buying requirements to connect with farmers meeting your quality criteria.",
+      action: "Post Buyer Demand →"
+    },
+    stat1: {
+      num: "4 Major",
+      label: "Government Mandis Monitored"
+    },
+    stat2: {
+      num: "100 Pts",
+      label: "AI Compatibility Match Engine"
+    },
+    stat3: {
+      num: "Real-Time",
+      label: "Smart Recommendation System"
+    },
+    signin: {
+      title: "🔑 Sign In",
+      subtitle: "Welcome back to Smart Mandi",
+      emailLabel: "Email Address *",
+      emailPlaceholder: "name@example.com",
+      passLabel: "Password *",
+      passPlaceholder: "••••••••",
+      submit: "Sign In",
+      submitting: "Signing in...",
+      footer: "Don't have an account?",
+      signupLink: "Sign Up here"
+    },
+    signup: {
+      title: "🌱 Create an Account",
+      subtitle: "Join as a Farmer/Seller or Buyer",
+      nameLabel: "Full Name / FPO / Company *",
+      namePlaceholder: "e.g. Ramesh Sahu or ABC Foods",
+      emailLabel: "Email Address *",
+      emailPlaceholder: "name@example.com",
+      phoneLabel: "Mobile / Contact Number *",
+      phonePlaceholder: "e.g. 9876543210",
+      passLabel: "Password *",
+      passPlaceholder: "Min. 4 characters",
+      roleLabel: "I am a: *",
+      roleFarmer: "🌾 Farmer / Seller (Selling crops)",
+      roleBuyer: "🏭 Buyer (Purchasing crops)",
+      submit: "Sign Up",
+      submitting: "Creating account...",
+      footer: "Already have an account?",
+      signinLink: "Sign In here"
+    },
+    prices: {
+      title: "📊 Market Prices",
+      cropLabel: "Crop",
+      allCrops: "All Crops",
+      marketLabel: "Market",
+      allMarkets: "All Markets",
+      btnFilter: "Filter",
+      btnClear: "Clear",
+      tableTitle: "Latest Prices (per quintal)",
+      thCrop: "Crop",
+      thMarket: "Market",
+      thDistrict: "District",
+      thDate: "Date",
+      thPriceRange: "Price Range (₹)",
+      thModalPrice: "Modal Price ₹",
+      loading: "Loading prices...",
+      noPrices: "No prices found for this filter.",
+      chartTitle: "📈 Price Trend Chart",
+      chartNote: "Historical modal prices from demo data. This is for trend analysis only, not a price prediction."
+    },
+    farmer: {
+      title: "🌱 Create Crop Listing",
+      subtitle: "Enter your crop details to find the best buyers and selling opportunities.",
+      formTitle: "Your Crop Details",
+      nameLabel: "Your Name / FPO Name *",
+      namePlaceholder: "e.g. Ramesh Sahu",
+      phoneLabel: "Contact / Mobile Number *",
+      phonePlaceholder: "e.g. 9876543210",
+      cropLabel: "Crop *",
+      cropSelect: "Select crop",
+      qualityLabel: "Quality Grade *",
+      qualitySelect: "Select grade",
+      gradeA: "Grade A (Best)",
+      gradeB: "Grade B (Good)",
+      gradeC: "Grade C (Average)",
+      qtyLabel: "Quantity (Quintals) *",
+      qtyPlaceholder: "e.g. 50",
+      priceLabel: "Expected Price (₹/Quintal) *",
+      pricePlaceholder: "e.g. 1300",
+      locationLabel: "Location / Village",
+      locationPlaceholder: "e.g. Durg, Chhattisgarh",
+      submit: "Submit Listing",
+      submitting: "Submitting...",
+      nextTitle: "💡 What happens next?",
+      step1: "Your listing is saved to the database",
+      step2: "You'll get a Listing ID — note it down",
+      step3: "Go to Match Results → enter your ID",
+      step4: "See all buyers matched to your crop with scores",
+      step5: "Go to Recommendation for the final verdict",
+      scoreTitle: "📋 Scoring Explained",
+      factor: "Factor",
+      points: "Points",
+      sameCrop: "Same crop",
+      required: "Required",
+      qtyMatch: "Quantity match",
+      qualMatch: "Quality match",
+      priceAdv: "Price advantage",
+      total: "Total"
+    },
+    buyer: {
+      title: "🏭 Post Buying Requirement",
+      subtitle: "Tell farmers what you need. They will see your request in their match results.",
+      formTitle: "Your Buying Requirement",
+      nameLabel: "Company / Buyer Name *",
+      namePlaceholder: "e.g. ABC Food Processors",
+      phoneLabel: "Contact / Mobile Number *",
+      phonePlaceholder: "e.g. 9876543210",
+      cropLabel: "Crop Required *",
+      cropSelect: "Select crop",
+      qualityLabel: "Quality Required *",
+      qualitySelect: "Select",
+      gradeA: "Grade A (Best)",
+      gradeB: "Grade B (Good)",
+      gradeC: "Grade C (Average)",
+      gradeAny: "Any Grade",
+      qtyLabel: "Required Quantity (Quintals) *",
+      qtyPlaceholder: "e.g. 100",
+      priceLabel: "Offered Price (₹/Quintal) *",
+      pricePlaceholder: "e.g. 1500",
+      locationLabel: "Buyer Location",
+      locationPlaceholder: "e.g. Raipur, Chhattisgarh",
+      submit: "Submit Request",
+      submitting: "Submitting...",
+      noticeTitle: "📢 Your request is visible to all farmers",
+      noticeDesc: "After submitting, farmers will see your request when they check their match results. The system will automatically compute a compatibility score.",
+      exampleTitle: "Example Scenario",
+      exampleText: "You post: \"Need 100 quintals of Grade A Tomato @ ₹1500/Q\"<br><br>A farmer lists: \"50 quintals of Grade A Tomato @ ₹1300/Q\"<br><br>System gives <strong>Match Score: 88/100</strong> because:<br>✓ Same crop · ✓ Quantity compatible · ✓ Quality matches · ✓ Price excellent"
+    },
+    listings: {
+      title: "🌾 Available Farmer Listings",
+      subtitle: "Browse active crop listings created by farmers. Find available crops and pricing details.",
+      filterCropLabel: "Filter by Crop",
+      allCrops: "All Crops",
+      btnRefresh: "Refresh Listings",
+      loading: "Loading listings...",
+      empty: "No farmer listings found.",
+      thId: "ID",
+      thFarmer: "Farmer / Seller",
+      thCrop: "Crop",
+      thQty: "Quantity (Q)",
+      thGrade: "Grade",
+      thExpectedPrice: "Expected Price (₹/Q)",
+      thLocation: "Location",
+      thContact: "Contact Number"
+    },
+    rec: {
+      title: "🏆 Smart Selling Recommendation",
+      subtitle: "The system compares the best buyer offer vs the best mandi price, and recommends the winner.",
+      inputLabel: "Farmer Listing ID",
+      inputPlaceholder: "Enter your listing ID (e.g. 1)",
+      btnGet: "🧠 Get Recommendation",
+      initialTitle: "Smart Selling Recommendation",
+      initialDesc: "Enter your Farmer Listing ID above and click \"Get Recommendation\" to view AI-powered price analysis, Mandi comparisons, and buyer opportunities.",
+      btnCreateListing: "🌱 Sell Crop / Create Listing",
+      signInRequiredTitle: "Sign In Required for Recommendations",
+      signInRequiredDesc: "Please sign in or create an account to view AI-powered crop selling recommendations and buyer matches tailored to your crop listings.",
+      btnSignIn: "🔑 Sign In",
+      btnSignUp: "🌱 Create Account",
+      computing: "🧠 Computing intelligent recommendation...",
+      recWinner: "🏆 Recommended Winner",
+      alternativeChannel: "Alternative Channel",
+      benchmarkComp: "Benchmark Comparison",
+      topPayoutChannel: "Top Payout Channel",
+      whyTitle: "🤖 Why This Is Recommended",
+      summaryVerdict: "Summary Verdict:",
+      btnContactBuyer: "📱 Contact Buyer",
+      btnContactFarmer: "📱 Contact Farmer",
+      btnViewPrices: "📊 View Mandi Prices"
+    },
+    crops: {
+      Tomato: "Tomato",
+      Potato: "Potato",
+      Onion: "Onion",
+      Paddy: "Paddy",
+      Wheat: "Wheat"
+    },
+    markets: {
+      Raipur: "Raipur",
+      Durg: "Durg",
+      Bhilai: "Bhilai",
+      Bilaspur: "Bilaspur"
+    }
+  },
+
+  hi: {
+    nav: {
+      home: "होम",
+      prices: "बाज़ार भाव",
+      sell: "फसल बेचें",
+      buy: "फसल खरीदें",
+      listings: "उपलब्ध लिस्टिंग",
+      recommend: "सिफारिश",
+      signIn: "साइन इन",
+      signUp: "साइन अप",
+      logout: "लॉगआउट",
+      farmerBadge: "किसान/विक्रेता",
+      buyerBadge: "खरीदार"
+    },
+    hero: {
+      h1: "जानें <span>कब, कहाँ,</span><br>और किसे बेचना है।",
+      desc: "स्मार्ट मंडी आपकी फसल के लिए सबसे अच्छा बेचने का अवसर देने के लिए मंडी भावों की तुलना खरीदार मांग से करती है।",
+      btnFarmer: "🌱 मैं एक किसान हूँ",
+      btnBuyer: "🏭 मैं एक खरीदार हूँ"
+    },
+    feature1: {
+      title: "लाइव मंडी भाव",
+      desc: "4 प्रमुख मंडियों - रायपुर, दुर्ग, भिलाई, बिलासपुर से वर्तमान मॉडल मूल्य।"
+    },
+    feature2: {
+      title: "खरीदार मैचिंग",
+      desc: "फसल, मात्रा, गुणवत्ता और मूल्य के आधार पर किसान और खरीदार का मिलान। 100 में से स्कोर।"
+    },
+    feature3: {
+      title: "स्मार्ट सिफारिश",
+      desc: "सिस्टम सर्वोत्तम खरीदार प्रस्ताव बनाम सर्वोत्तम मंडी मूल्य की तुलना करता है और विजेता की सिफारिश करता है।"
+    },
+    showcase: {
+      title: "🌱 कृषि बाज़ार प्रदर्शनी",
+      desc: "छत्तीसगढ़ में लाइव फसल श्रेणियों, सत्यापित खरीदार मांग और कृषि लिस्टिंग का अन्वेषण करें"
+    },
+    agri1: {
+      badge: "उच्च मांग",
+      title: "सुनहरा गेहूं और अनाज",
+      meta: "🌾 उच्च मंडी मांग",
+      desc: "रायपुर, दुर्ग, भिलाई और बिलासपुर मंडियों में सत्यापित दैनिक मॉडल भाव।",
+      action: "बाज़ार भाव देखें →"
+    },
+    agri2: {
+      badge: "ग्रेड A उपज",
+      title: "ताजा टमाटर और सब्जियां",
+      meta: "🍅 किसान लिस्टिंग",
+      desc: "तत्काल बिक्री के लिए तैयार स्थानीय किसानों और एफपीओ की सक्रिय फसल लिस्टिंग देखें।",
+      action: "उपलब्ध लिस्टिंग देखें →"
+    },
+    agri3: {
+      badge: "स्मार्ट व्यापार",
+      title: "थोक उपज और मशीनरी",
+      meta: "🚜 प्रत्यक्ष आपूर्ति श्रृंखला",
+      desc: "अपनी कटी हुई फसल सीधे सत्यापित खाद्य प्रसंस्करणकर्ताओं और कृषि खरीदारों को बेचें।",
+      action: "अपनी फसल अभी बेचें →"
+    },
+    agri4: {
+      badge: "प्रमाणित गुणवत्ता",
+      title: "जैविक धान और अंकुर",
+      meta: "🌱 गुणवत्ता मिलान",
+      desc: "अपनी गुणवत्ता मानदंडों को पूरा करने वाले किसानों से जुड़ने के लिए अपनी खरीद आवश्यकताएं पोस्ट करें।",
+      action: "खरीदार मांग पोस्ट करें →"
+    },
+    stat1: {
+      num: "4 प्रमुख",
+      label: "सरकारी मंडियों पर नज़र"
+    },
+    stat2: {
+      num: "100 अंक",
+      label: "एआई अनुकूलता मैच इंजन"
+    },
+    stat3: {
+      num: "रियल-टाइम",
+      label: "स्मार्ट सिफारिश प्रणाली"
+    },
+    signin: {
+      title: "🔑 साइन इन",
+      subtitle: "स्मार्ट मंडी में आपका पुनः स्वागत है",
+      emailLabel: "ईमेल पता *",
+      emailPlaceholder: "name@example.com",
+      passLabel: "पासवर्ड *",
+      passPlaceholder: "••••••••",
+      submit: "साइन इन",
+      submitting: "साइन इन हो रहा है...",
+      footer: "खाता नहीं है?",
+      signupLink: "यहाँ साइन अप करें"
+    },
+    signup: {
+      title: "🌱 खाता बनाएं",
+      subtitle: "किसान/विक्रेता या खरीदार के रूप में जुड़ें",
+      nameLabel: "पूरा नाम / एफपीओ / कंपनी *",
+      namePlaceholder: "उदा. रमेश साहू या एबीसी फूड्स",
+      emailLabel: "ईमेल पता *",
+      emailPlaceholder: "name@example.com",
+      phoneLabel: "मोबाइल / संपर्क नंबर *",
+      phonePlaceholder: "उदा. 9876543210",
+      passLabel: "पासवर्ड *",
+      passPlaceholder: "न्यूनतम 4 अक्षर",
+      roleLabel: "मैं हूँ: *",
+      roleFarmer: "🌾 किसान / विक्रेता (फसल बेचना)",
+      roleBuyer: "🏭 खरीदार (फसल खरीदना)",
+      submit: "साइन अप",
+      submitting: "खाता बनाया जा रहा है...",
+      footer: "पहले से ही एक खाता है?",
+      signinLink: "यहाँ साइन इन करें"
+    },
+    prices: {
+      title: "📊 बाज़ार भाव",
+      cropLabel: "फसल",
+      allCrops: "सभी फसलें",
+      marketLabel: "मंडी",
+      allMarkets: "सभी मंडियाँ",
+      btnFilter: "फ़िल्टर",
+      btnClear: "साफ़ करें",
+      tableTitle: "नवीनतम भाव (प्रति क्विंटल)",
+      thCrop: "फसल",
+      thMarket: "मंडी",
+      thDistrict: "जिला",
+      thDate: "दिनांक",
+      thPriceRange: "मूल्य सीमा (₹)",
+      thModalPrice: "मॉडल मूल्य ₹",
+      loading: "भाव लोड हो रहे हैं...",
+      noPrices: "इस फ़िल्टर के लिए कोई भाव नहीं मिला।",
+      chartTitle: "📈 मूल्य प्रवृत्ति चार्ट",
+      chartNote: "डेमो डेटा से ऐतिहासिक मॉडल भाव। यह केवल रुझान विश्लेषण के लिए है, मूल्य भविष्यवाणी नहीं।"
+    },
+    farmer: {
+      title: "🌱 फसल लिस्टिंग बनाएं",
+      subtitle: "सर्वोत्तम खरीदारों और बिक्री के अवसरों को खोजने के लिए अपनी फसल विवरण दर्ज करें।",
+      formTitle: "आपकी फसल का विवरण",
+      nameLabel: "आपका नाम / एफपीओ का नाम *",
+      namePlaceholder: "उदा. रमेश साहू",
+      phoneLabel: "संपर्क / मोबाइल नंबर *",
+      phonePlaceholder: "उदा. 9876543210",
+      cropLabel: "फसल *",
+      cropSelect: "फसल चुनें",
+      qualityLabel: "गुणवत्ता श्रेणी *",
+      qualitySelect: "ग्रेड चुनें",
+      gradeA: "ग्रेड A (सर्वश्रेष्ठ)",
+      gradeB: "ग्रेड B (अच्छा)",
+      gradeC: "ग्रेड C (औसत)",
+      qtyLabel: "मात्रा (क्विंटल) *",
+      qtyPlaceholder: "उदा. 50",
+      priceLabel: "अपेक्षित मूल्य (₹/क्विंटल) *",
+      pricePlaceholder: "उदा. 1300",
+      locationLabel: "स्थान / गांव",
+      locationPlaceholder: "उदा. दुर्ग, छत्तीसगढ़",
+      submit: "लिस्टिंग जमा करें",
+      submitting: "जमा हो रहा है...",
+      nextTitle: "💡 आगे क्या होता है?",
+      step1: "आपकी लिस्टिंग डेटाबेस में सहेजी जाती है",
+      step2: "आपको एक लिस्टिंग आईडी मिलेगी - इसे नोट कर लें",
+      step3: "मैच परिणाम पर जाएं → अपनी आईडी दर्ज करें",
+      step4: "स्कोर के साथ अपनी फसल से मेल खाने वाले सभी खरीदारों को देखें",
+      step5: "अंतिम निर्णय के लिए सिफारिश पर जाएं",
+      scoreTitle: "📋 स्कोरिंग स्पष्टीकरण",
+      factor: "कारक",
+      points: "अंक",
+      sameCrop: "समान फसल",
+      required: "आवश्यक",
+      qtyMatch: "मात्रा मिलान",
+      qualMatch: "गुणवत्ता मिलान",
+      priceAdv: "मूल्य लाभ",
+      total: "कुल"
+    },
+    buyer: {
+      title: "🏭 खरीद आवश्यकता पोस्ट करें",
+      subtitle: "किसानों को बताएं कि आपको क्या चाहिए। वे आपकी आवश्यकता को अपने मैच परिणामों में देखेंगे।",
+      formTitle: "आपकी खरीद आवश्यकता",
+      nameLabel: "कंपनी / खरीदार का नाम *",
+      namePlaceholder: "उदा. एबीसी फूड प्रोसेसर्स",
+      phoneLabel: "संपर्क / मोबाइल नंबर *",
+      phonePlaceholder: "उदा. 9876543210",
+      cropLabel: "आवश्यक फसल *",
+      cropSelect: "फसल चुनें",
+      qualityLabel: "आवश्यक गुणवत्ता *",
+      qualitySelect: "चुनें",
+      gradeA: "ग्रेड A (सर्वश्रेष्ठ)",
+      gradeB: "ग्रेड B (अच्छा)",
+      gradeC: "ग्रेड C (औसत)",
+      gradeAny: "कोई भी ग्रेड",
+      qtyLabel: "आवश्यक मात्रा (क्विंटल) *",
+      qtyPlaceholder: "उदा. 100",
+      priceLabel: "पेशकश मूल्य (₹/क्विंटल) *",
+      pricePlaceholder: "उदा. 1500",
+      locationLabel: "खरीदार स्थान",
+      locationPlaceholder: "उदा. रायपुर, छत्तीसगढ़",
+      submit: "अनुरोध जमा करें",
+      submitting: "जमा हो रहा है...",
+      noticeTitle: "📢 आपका अनुरोध सभी किसानों को दिखाई देता है",
+      noticeDesc: "जमा करने के बाद, किसान अपने मैच परिणाम देखते समय आपका अनुरोध देखेंगे। सिस्टम स्वचालित रूप से स्कोर की गणना करेगा।",
+      exampleTitle: "उदाहरण परिदृश्य",
+      exampleText: "आप पोस्ट करते हैं: \"100 क्विंटल ग्रेड A टमाटर @ ₹1500/Q आवश्यक\"<br><br>एक किसान लिस्ट करता है: \"50 क्विंटल ग्रेड A टमाटर @ ₹1300/Q\"<br><br>सिस्टम **मैच स्कोर: 88/100** देता है क्योंकि:<br>✓ समान फसल · ✓ मात्रा अनुकूल · ✓ गुणवत्ता मेल खाती है · ✓ मूल्य उत्कृष्ट"
+    },
+    listings: {
+      title: "🌾 उपलब्ध किसान लिस्टिंग",
+      subtitle: "किसानों द्वारा बनाई गई सक्रिय फसल लिस्टिंग देखें। उपलब्ध फसलों और मूल्य निर्धारण विवरण खोजें।",
+      filterCropLabel: "फसल के अनुसार फ़िल्टर करें",
+      allCrops: "सभी फसलें",
+      btnRefresh: "लिस्टिंग ताज़ा करें",
+      loading: "लिस्टिंग लोड हो रही हैं...",
+      empty: "कोई किसान लिस्टिंग नहीं मिली।",
+      thId: "आईडी",
+      thFarmer: "किसान / विक्रेता",
+      thCrop: "फसल",
+      thQty: "मात्रा (क्विंटल)",
+      thGrade: "ग्रेड",
+      thExpectedPrice: "अपेक्षित मूल्य (₹/क्विंटल)",
+      thLocation: "स्थान",
+      thContact: "संपर्क नंबर"
+    },
+    rec: {
+      title: "🏆 स्मार्ट बिक्री सिफारिश",
+      subtitle: "सिस्टम सर्वश्रेष्ठ खरीदार प्रस्ताव बनाम सर्वोत्तम मंडी मूल्य की तुलना करता है, और विजेता की सिफारिश करता है।",
+      inputLabel: "किसान लिस्टिंग आईडी",
+      inputPlaceholder: "अपनी लिस्टिंग आईडी दर्ज करें (उदा. 1)",
+      btnGet: "🧠 सिफारिश प्राप्त करें",
+      initialTitle: "स्मार्ट बिक्री सिफारिश",
+      initialDesc: "एआई-संचालित मूल्य विश्लेषण, मंडी तुलना और खरीदार के अवसरों को देखने के लिए ऊपर अपनी किसान लिस्टिंग आईडी दर्ज करें और \"सिफारिश प्राप्त करें\" पर क्लिक करें।",
+      btnCreateListing: "🌱 फसल बेचें / लिस्टिंग बनाएं",
+      signInRequiredTitle: "सिफारिशों के लिए साइन इन आवश्यक है",
+      signInRequiredDesc: "अपनी फसल लिस्टिंग के अनुरूप एआई-संचालित फसल बिक्री सिफारिशें और खरीदार मैच देखने के लिए कृपया साइन इन करें या खाता बनाएं।",
+      btnSignIn: "🔑 साइन इन",
+      btnSignUp: "🌱 खाता बनाएं",
+      computing: "🧠 स्मार्ट सिफारिश की गणना की जा रही है...",
+      recWinner: "🏆 अनुशंसित विजेता",
+      alternativeChannel: "वैकल्पिक चैनल",
+      benchmarkComp: "मानदंड तुलना",
+      topPayoutChannel: "शीर्ष भुगतान चैनल",
+      whyTitle: "🤖 यह सिफारिश क्यों की गई है",
+      summaryVerdict: "अंतिम निर्णय:",
+      btnContactBuyer: "📱 खरीदार से संपर्क करें",
+      btnContactFarmer: "📱 किसान से संपर्क करें",
+      btnViewPrices: "📊 बाज़ार भाव देखें"
+    },
+    crops: {
+      Tomato: "टमाटर (Tomato)",
+      Potato: "आलू (Potato)",
+      Onion: "प्याज (Onion)",
+      Paddy: "धान (Paddy)",
+      Wheat: "गेहूं (Wheat)"
+    },
+    markets: {
+      Raipur: "रायपुर",
+      Durg: "दुर्ग",
+      Bhilai: "भिलाई",
+      Bilaspur: "बिलासपुर"
+    }
+  }
+};
+
+function getLanguage() {
+  return localStorage.getItem('language') || 'en';
+}
+
+function getTranslation(lang, key) {
+  const keys = key.split('.');
+  let obj = translations[lang] || translations['en'];
+  for (const k of keys) {
+    if (obj && obj[k] !== undefined) {
+      obj = obj[k];
+    } else {
+      let fallbackObj = translations['en'];
+      for (const fk of keys) {
+        if (fallbackObj && fallbackObj[fk] !== undefined) {
+          fallbackObj = fallbackObj[fk];
+        } else {
+          return null;
+        }
+      }
+      return fallbackObj;
+    }
+  }
+  return obj;
+}
+
+function setLanguage(lang) {
+  const currentLang = (lang === 'hi') ? 'hi' : 'en';
+  localStorage.setItem('language', currentLang);
+
+  // Update UI text for all data-i18n elements
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    const translation = getTranslation(currentLang, key);
+    if (translation) {
+      if (el.hasAttribute('data-i18n-html')) {
+        el.innerHTML = translation;
+      } else {
+        el.textContent = translation;
+      }
+    }
+  });
+
+  // Update UI placeholders
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    const translation = getTranslation(currentLang, key);
+    if (translation) {
+      el.placeholder = translation;
+    }
+  });
+
+  // Update Language Selector Button UI
+  const langText = document.getElementById('lang-text');
+  if (langText) {
+    langText.textContent = (currentLang === 'hi') ? 'हिंदी' : 'English';
+  }
+
+  // Highlight active option in dropdown
+  document.querySelectorAll('.lang-option').forEach(opt => {
+    if (opt.getAttribute('data-lang') === currentLang) {
+      opt.classList.add('active');
+    } else {
+      opt.classList.remove('active');
+    }
+  });
+
+  // Update Auth UI to sync badges/buttons
+  updateAuthUI();
+}
+
+function initLanguageSelector() {
+  const langBtn = document.getElementById('lang-btn');
+  const langSelector = document.getElementById('lang-selector');
+  const langOptions = document.querySelectorAll('.lang-option');
+
+  if (langBtn && langSelector) {
+    langBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = langSelector.classList.toggle('open');
+      langBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+
+    langOptions.forEach(opt => {
+      opt.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const selectedLang = opt.getAttribute('data-lang');
+        setLanguage(selectedLang);
+        langSelector.classList.remove('open');
+        langBtn.setAttribute('aria-expanded', 'false');
+      });
+    });
+
+    // Outside click handler
+    document.addEventListener('click', (e) => {
+      if (!langSelector.contains(e.target)) {
+        langSelector.classList.remove('open');
+        langBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    // Keyboard Escape handler
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        langSelector.classList.remove('open');
+        langBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+
+  // Apply saved/default language
+  setLanguage(getLanguage());
+}
+
+window.getLanguage = getLanguage;
+window.getTranslation = getTranslation;
+window.setLanguage = setLanguage;
+
 // ── Auth State & Helper Functions ─────────────────────────────────────────────
 function getAuthToken() { return localStorage.getItem('auth_token'); }
 function getAuthUser() {
@@ -31,11 +653,18 @@ function updateAuthUI() {
   const navAuth = document.getElementById('nav-auth');
   if (!navAuth) return;
 
+  const currentLang = getLanguage();
+  const signInText = getTranslation(currentLang, 'nav.signIn') || 'Sign In';
+  const signUpText = getTranslation(currentLang, 'nav.signUp') || 'Sign Up';
+  const logoutText = getTranslation(currentLang, 'nav.logout') || 'Logout';
+  const farmerBadge = getTranslation(currentLang, 'nav.farmerBadge') || 'Farmer/Seller';
+  const buyerBadge = getTranslation(currentLang, 'nav.buyerBadge') || 'Buyer';
+
   if (user) {
-    const roleLabel = user.role === 'farmer' ? 'Farmer/Seller' : 'Buyer';
+    const roleLabel = user.role === 'farmer' ? farmerBadge : buyerBadge;
     navAuth.innerHTML = `
       <span class="user-badge">👤 ${user.name} (${roleLabel})</span>
-      <button class="btn btn-secondary btn-sm" onclick="logout()">Logout</button>
+      <button class="btn btn-secondary btn-sm" onclick="logout()">${logoutText}</button>
     `;
 
     // Pre-fill user name in forms if empty
@@ -48,8 +677,8 @@ function updateAuthUI() {
     }
   } else {
     navAuth.innerHTML = `
-      <button class="btn btn-outline btn-sm" onclick="showSection('sec-signin')">Sign In</button>
-      <button class="btn btn-primary btn-sm" onclick="showSection('sec-signup')">Sign Up</button>
+      <button class="btn btn-outline btn-sm" onclick="showSection('sec-signin')" data-i18n="nav.signIn">${signInText}</button>
+      <button class="btn btn-primary btn-sm" onclick="showSection('sec-signup')" data-i18n="nav.signUp">${signUpText}</button>
     `;
   }
 }
@@ -846,6 +1475,9 @@ document.addEventListener('DOMContentLoaded', () => {
     chartCrop.addEventListener('change', () => loadTrendChart(chartCrop.value, chartMarket.value));
     chartMarket.addEventListener('change', () => loadTrendChart(chartCrop.value, chartMarket.value));
   }
+
+  // Initialize Language Selector
+  initLanguageSelector();
 
   // Initialize Auth UI state
   updateAuthUI();

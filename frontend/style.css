@@ -44,6 +44,82 @@ nav {
 
 .nav-auth { display: flex; align-items: center; gap: 0.6rem; }
 .nav-actions { display: flex; align-items: center; gap: 0.5rem; }
+.lang-selector {
+  position: relative;
+  display: inline-block;
+}
+.lang-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: white;
+  border: 1.5px solid #16a34a;
+  color: #15803d;
+  padding: 0.35rem 0.65rem;
+  border-radius: 7px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  font-family: inherit;
+  line-height: 1.2;
+}
+.lang-btn:hover {
+  background: #f0fdf4;
+}
+.lang-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
+}
+.lang-arrow {
+  font-size: 0.65rem;
+  transition: transform 0.2s ease;
+  color: #16a34a;
+}
+.lang-selector.open .lang-arrow {
+  transform: rotate(180deg);
+}
+.lang-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  min-width: 120px;
+  z-index: 150;
+  overflow: hidden;
+  padding: 4px 0;
+}
+.lang-selector.open .lang-dropdown {
+  display: block;
+}
+.lang-option {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 0.85rem;
+  background: none;
+  border: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  font-family: inherit;
+}
+.lang-option:hover {
+  background: #f0fdf4;
+  color: #15803d;
+}
+.lang-option.active {
+  background: #dcfce7;
+  color: #166534;
+  font-weight: 700;
+}
 .hamburger-btn {
   display: none;
   background: transparent;
@@ -406,6 +482,12 @@ body {
 
     .nav-actions {
         gap: 6px;
+    }
+
+    .lang-btn {
+        padding: 0.35rem 0.5rem;
+        font-size: 0.75rem;
+        gap: 0.25rem;
     }
 
     .nav-auth {
