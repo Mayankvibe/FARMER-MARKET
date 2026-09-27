@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Smart Mandi — Smart Crop Selling Platform</title>
   <meta name="description" content="Smart Mandi helps farmers find the best selling opportunity by comparing mandi prices and buyer demand.">
-  <link rel="stylesheet" href="style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=4">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 </head>
 <body>
@@ -200,7 +200,7 @@
       <div id="signup-msg" class="alert hidden"></div>
       <form id="signup-form">
         <div class="form-group">
-          <label for="signup-name" data-i18n="signup.nameLabel">Full Name / FPO / Company *</label>
+          <label for="signup-name" data-i18n="signup.nameLabel">Full Name / Company *</label>
           <input id="signup-name" type="text" placeholder="e.g. Ramesh Sahu or ABC Foods" data-i18n-placeholder="signup.namePlaceholder" required>
         </div>
         <div class="form-group">
@@ -242,8 +242,12 @@
   <!-- Filters -->
   <div class="filters">
     <div class="filter-group">
+      <label class="filter-label" data-i18n="prices.searchLabel">Search</label>
+      <input type="text" id="filter-prices-search" class="form-control" placeholder="Search crop, market, district..." data-i18n-placeholder="prices.searchPlaceholder" oninput="loadPrices()">
+    </div>
+    <div class="filter-group">
       <label class="filter-label" data-i18n="prices.cropLabel">Crop</label>
-      <select id="filter-crop" class="form-control">
+      <select id="filter-crop" class="form-control" onchange="loadPrices()">
         <option value="" data-i18n="prices.allCrops">All Crops</option>
         <option value="Tomato" data-i18n="crops.Tomato">Tomato</option>
         <option value="Potato" data-i18n="crops.Potato">Potato</option>
@@ -254,7 +258,7 @@
     </div>
     <div class="filter-group">
       <label class="filter-label" data-i18n="prices.marketLabel">Market</label>
-      <select id="filter-market" class="form-control">
+      <select id="filter-market" class="form-control" onchange="loadPrices()">
         <option value="" data-i18n="prices.allMarkets">All Markets</option>
         <option value="Raipur" data-i18n="markets.Raipur">Raipur</option>
         <option value="Durg" data-i18n="markets.Durg">Durg</option>
@@ -263,7 +267,7 @@
       </select>
     </div>
     <button class="btn btn-primary" onclick="loadPrices()" data-i18n="prices.btnFilter">Filter</button>
-    <button class="btn btn-secondary" onclick="document.getElementById('filter-crop').value='';document.getElementById('filter-market').value='';loadPrices();" data-i18n="prices.btnClear">Clear</button>
+    <button class="btn btn-secondary" onclick="document.getElementById('filter-prices-search').value='';document.getElementById('filter-crop').value='';document.getElementById('filter-market').value='';loadPrices();" data-i18n="prices.btnClear">Clear</button>
   </div>
 
   <!-- Table -->
@@ -487,6 +491,10 @@
 
   <div class="filters">
     <div class="filter-group">
+      <label class="filter-label" data-i18n="listings.searchLabel">Search</label>
+      <input type="text" id="filter-buyer-listings-search" class="form-control" placeholder="Search farmer, crop, location..." data-i18n-placeholder="listings.searchPlaceholder" oninput="loadBuyerListings()">
+    </div>
+    <div class="filter-group">
       <label class="filter-label" data-i18n="listings.filterCropLabel">Filter by Crop</label>
       <select id="filter-buyer-listings-crop" class="form-control" onchange="loadBuyerListings()">
         <option value="" data-i18n="listings.allCrops">All Crops</option>
@@ -498,6 +506,7 @@
       </select>
     </div>
     <button class="btn btn-primary" onclick="loadBuyerListings()" data-i18n="listings.btnRefresh">Refresh Listings</button>
+    <button class="btn btn-secondary" onclick="document.getElementById('filter-buyer-listings-search').value='';document.getElementById('filter-buyer-listings-crop').value='';loadBuyerListings();" data-i18n="prices.btnClear">Clear</button>
   </div>
 
   <div class="card">
@@ -554,6 +563,6 @@
 
  
 
-<script src="script.js?v=3"></script>
+<script src="script.js?v=4"></script>
 </body>
 </html>

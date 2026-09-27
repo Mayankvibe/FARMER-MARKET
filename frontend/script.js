@@ -120,6 +120,8 @@ const translations = {
     },
     prices: {
       title: "📊 Market Prices",
+      searchLabel: "Search",
+      searchPlaceholder: "Search crop, market, district...",
       cropLabel: "Crop",
       allCrops: "All Crops",
       marketLabel: "Market",
@@ -209,6 +211,8 @@ const translations = {
     listings: {
       title: "🌾 Available Farmer Listings",
       subtitle: "Browse active crop listings created by farmers. Find available crops and pricing details.",
+      searchLabel: "Search",
+      searchPlaceholder: "Search farmer, crop, location...",
       filterCropLabel: "Filter by Crop",
       allCrops: "All Crops",
       btnRefresh: "Refresh Listings",
@@ -371,6 +375,8 @@ const translations = {
     },
     prices: {
       title: "📊 बाज़ार भाव",
+      searchLabel: "खोजें",
+      searchPlaceholder: "फसल, मंडी, जिला खोजें...",
       cropLabel: "फसल",
       allCrops: "सभी फसलें",
       marketLabel: "मंडी",
@@ -460,6 +466,8 @@ const translations = {
     listings: {
       title: "🌾 उपलब्ध किसान लिस्टिंग",
       subtitle: "किसानों द्वारा बनाई गई सक्रिय फसल लिस्टिंग देखें। उपलब्ध फसलों और मूल्य निर्धारण विवरण खोजें।",
+      searchLabel: "खोजें",
+      searchPlaceholder: "किसान, फसल, स्थान खोजें...",
       filterCropLabel: "फसल के अनुसार फ़िल्टर करें",
       allCrops: "सभी फसलें",
       btnRefresh: "लिस्टिंग ताज़ा करें",
@@ -796,13 +804,17 @@ let priceChart = null;
 async function loadPrices() {
   const crop   = document.getElementById('filter-crop').value;
   const market = document.getElementById('filter-market').value;
+  const searchInput = document.getElementById('filter-prices-search');
+  const search = searchInput ? searchInput.value.trim().toLowerCase() : '';
 
   const params = new URLSearchParams();
   if (crop)   params.append('crop', crop);
   if (market) params.append('market', market);
 
+  const currentLang = getLanguage();
+  const loadingMsg = getTranslation(currentLang, 'prices.loading') || 'Loading prices...';
   document.getElementById('prices-table-body').innerHTML =
-    '<tr><td colspan="6" class="loading">Loading prices...</td></tr>';
+    `<tr><td colspan="6" class="loading" data-i18n="prices.loading">${loadingMsg}</td></tr>`;
 
   try {
     const data = await apiFetch(`/market-prices/latest`);
@@ -811,9 +823,21 @@ async function loadPrices() {
     if (crop)   rows = rows.filter(r => r.crop.toLowerCase()   === crop.toLowerCase());
     if (market) rows = rows.filter(r => r.market.toLowerCase() === market.toLowerCase());
 
+    if (search) {
+      rows = rows.filter(r => {
+        return (r.crop && r.crop.toLowerCase().includes(search)) ||
+               (r.market && r.market.toLowerCase().includes(search)) ||
+               (r.district && r.district.toLowerCase().includes(search)) ||
+               (r.modal_price && String(r.modal_price).includes(search)) ||
+               (r.min_price && String(r.min_price).includes(search)) ||
+               (r.max_price && String(r.max_price).includes(search));
+      });
+    }
+
     if (!rows.length) {
+      const noPricesMsg = getTranslation(currentLang, 'prices.noPrices') || 'No prices found for this filter.';
       document.getElementById('prices-table-body').innerHTML =
-        '<tr><td colspan="6" class="empty">No prices found for this filter.</td></tr>';
+        `<tr><td colspan="6" class="empty" data-i18n="prices.noPrices">${noPricesMsg}</td></tr>`;
       return;
     }
 
@@ -1395,10 +1419,16 @@ async function handleSignUp(e) {
 async function loadBuyerListings() {
   const tbody = document.getElementById('buyer-listings-table-body');
   if (!tbody) return;
-  tbody.innerHTML = '<tr><td colspan="8" class="loading">Loading listings...</td></tr>';
+
+  const currentLang = getLanguage();
+  const loadingMsg = getTranslation(currentLang, 'listings.loading') || 'Loading listings...';
+  tbody.innerHTML = `<tr><td colspan="8" class="loading" data-i18n="listings.loading">${loadingMsg}</td></tr>`;
 
   const filterCropElem = document.getElementById('filter-buyer-listings-crop');
   const cropFilter = filterCropElem ? filterCropElem.value : '';
+
+  const searchInput = document.getElementById('filter-buyer-listings-search');
+  const search = searchInput ? searchInput.value.trim().toLowerCase() : '';
 
   try {
     let listings = await apiFetch('/farmer-listing');
@@ -1406,8 +1436,20 @@ async function loadBuyerListings() {
       listings = listings.filter(l => l.crop.toLowerCase() === cropFilter.toLowerCase());
     }
 
+    if (search) {
+      listings = listings.filter(l => {
+        return (l.farmer_name && l.farmer_name.toLowerCase().includes(search)) ||
+               (l.crop && l.crop.toLowerCase().includes(search)) ||
+               (l.location && l.location.toLowerCase().includes(search)) ||
+               (l.contact_number && l.contact_number.includes(search)) ||
+               (l.id && String(l.id).includes(search)) ||
+               (l.expected_price && String(l.expected_price).includes(search));
+      });
+    }
+
     if (!listings || !listings.length) {
-      tbody.innerHTML = '<tr><td colspan="8" class="empty">No farmer listings found.</td></tr>';
+      const emptyMsg = getTranslation(currentLang, 'listings.empty') || 'No farmer listings found.';
+      tbody.innerHTML = `<tr><td colspan="8" class="empty" data-i18n="listings.empty">${emptyMsg}</td></tr>`;
       return;
     }
 
